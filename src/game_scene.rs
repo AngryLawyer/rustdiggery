@@ -1,8 +1,9 @@
 use scene::{Scene, BoxedScene, SceneCommand};
 use opengl_graphics::Gl;
 use event::RenderArgs;
-use input::Button;
+use input::{Button, Key};
 use graphics;
+use graphics::RelativeTransform;
 
 #[derive(Clone)]
 enum CellState {
@@ -29,14 +30,16 @@ impl World {
 
 pub struct GameScene {
     quit: bool,
-    world: World
+    world: World,
+    camera_pos: (f64, f64)
 }
 
 impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene { 
             quit: false,
-            world: World::new(10, 10)
+            world: World::new(10, 10),
+            camera_pos: (0.0, 0.0)
         })
     }
 }
@@ -48,7 +51,12 @@ impl Scene for GameScene {
         const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
         const CELL_SIZE: u32 = 32;
 
-        let context = &graphics::Context::abs(args.width as f64, args.height as f64);
+        let (camera_x, camera_y) = self.camera_pos;
+
+        let context = &graphics::Context::abs(args.width as f64, args.height as f64)
+            .trans(((args.width / 2) - (CELL_SIZE / 2)) as f64, ((args.height / 2) - (CELL_SIZE / 2)) as f64) //Camera is in the centre of the screen
+            .trans(-camera_x, -camera_y);
+
         gl.draw([0, 0, args.width as i32, args.height as i32], |_, gl| {
             graphics::clear(BLACK, gl);
             for (i, cell) in self.world.cells.iter().enumerate() {
@@ -71,7 +79,7 @@ impl Scene for GameScene {
 
     fn think(&mut self) -> Option<SceneCommand> {
 
-        if (self.quit) {
+        if self.quit {
             Some(SceneCommand::PopScene)
         } else {
             None
@@ -79,6 +87,25 @@ impl Scene for GameScene {
     }
 
     fn input(&mut self, button: &Button) {
-        self.quit = true;
+        match button {
+            &Button::Keyboard(Key::Up) => {
+                let (x, y) = self.camera_pos;
+                self.camera_pos = (x, y - 1.0);
+            },
+            &Button::Keyboard(Key::Down) => {
+                let (x, y) = self.camera_pos;
+                self.camera_pos = (x, y + 1.0);
+            },
+            &Button::Keyboard(Key::Left) => {
+                let (x, y) = self.camera_pos;
+                self.camera_pos = (x - 1.0, y);
+            },
+            &Button::Keyboard(Key::Right) => {
+                let (x, y) = self.camera_pos;
+                self.camera_pos = (x + 1.0, y);
+            },
+            _ => ()
+        }
+        //self.quit = true;
     }
 }
