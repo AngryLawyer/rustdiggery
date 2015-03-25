@@ -5,7 +5,8 @@ use input::Button;
 pub trait Scene {
     fn render(&self, gl: &mut Gl, args: &RenderArgs);
     fn think(&mut self) -> Option<SceneCommand>;
-    fn input(&mut self, button: &Button);
+    fn press(&mut self, button: &Button);
+    fn release(&mut self, button: &Button);
 }
 
 pub type BoxedScene = Box<Scene + 'static>;

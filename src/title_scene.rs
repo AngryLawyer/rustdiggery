@@ -24,6 +24,6 @@ impl Scene for TitleScene {
         Some(SceneCommand::SetScene(GameScene::new()))
     }
     
-    fn input(&mut self, button: &Button) {
-    }
+    fn press(&mut self, button: &Button) {}
+    fn release(&mut self, button: &Button) {}
 }

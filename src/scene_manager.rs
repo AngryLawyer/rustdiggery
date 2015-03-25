@@ -52,10 +52,20 @@ impl SceneManager {
         }
     }
 
-    pub fn input(&mut self, args: &Button) {
+    pub fn press(&mut self, args: &Button) {
         match self.scene_stack.pop() {
             Some(mut scene) => {
-                scene.input(args);
+                scene.press(args);
+                self.scene_stack.push(scene);
+            },
+            None => ()
+        }
+    }
+
+    pub fn release(&mut self, args: &Button) {
+        match self.scene_stack.pop() {
+            Some(mut scene) => {
+                scene.release(args);
                 self.scene_stack.push(scene);
             },
             None => ()

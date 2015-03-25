@@ -8,7 +8,7 @@ extern crate graphics;
 
 use sdl2_window::Sdl2Window as Window;
 use window::WindowSettings;
-use event::{Events, RenderEvent, UpdateEvent, PressEvent};
+use event::{Events, RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 use opengl_graphics::Gl;
 
 use std::cell::RefCell;
@@ -39,8 +39,13 @@ fn main() {
     
     for e in event::events(&window) {
         if let Some(p) = e.press_args() {
-            manager.input(&p);
+            manager.press(&p);
         }
+
+        if let Some(p) = e.release_args() {
+            manager.release(&p);
+        }
+
         if let Some(r) = e.render_args() {
             manager.render(&mut gl, &r);
         }

@@ -38,7 +38,7 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene { 
             quit: false,
-            world: World::new(10, 10),
+            world: World::new(100, 100),
             camera_pos: (0.0, 0.0)
         })
     }
@@ -86,7 +86,7 @@ impl Scene for GameScene {
         }
     }
 
-    fn input(&mut self, button: &Button) {
+    fn press(&mut self, button: &Button) {
         match button {
             &Button::Keyboard(Key::Up) => {
                 let (x, y) = self.camera_pos;
@@ -107,5 +107,8 @@ impl Scene for GameScene {
             _ => ()
         }
         //self.quit = true;
+    }
+
+    fn release(&mut self, button: &Button) {
     }
 }
