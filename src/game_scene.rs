@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use scene::{Scene, BoxedScene, SceneCommand};
 use opengl_graphics::Gl;
 use event::RenderArgs;
@@ -31,6 +32,7 @@ impl World {
 pub struct GameScene {
     quit: bool,
     world: World,
+    keys: HashSet<Key>,
     camera_pos: (f64, f64)
 }
 
@@ -39,6 +41,7 @@ impl GameScene {
         Box::new(GameScene { 
             quit: false,
             world: World::new(100, 100),
+            keys: HashSet::new(),
             camera_pos: (0.0, 0.0)
         })
     }
@@ -79,6 +82,28 @@ impl Scene for GameScene {
 
     fn think(&mut self) -> Option<SceneCommand> {
 
+        for &key in self.keys.iter() {
+            match key {
+                Key::Up => {
+                    let (x, y) = self.camera_pos;
+                    self.camera_pos = (x, y - 1.0);
+                },
+                Key::Down => {
+                    let (x, y) = self.camera_pos;
+                    self.camera_pos = (x, y + 1.0);
+                },
+                Key::Left => {
+                    let (x, y) = self.camera_pos;
+                    self.camera_pos = (x - 1.0, y);
+                },
+                Key::Right => {
+                    let (x, y) = self.camera_pos;
+                    self.camera_pos = (x + 1.0, y);
+                },
+                _ => ()
+            }
+        };
+
         if self.quit {
             Some(SceneCommand::PopScene)
         } else {
@@ -88,27 +113,20 @@ impl Scene for GameScene {
 
     fn press(&mut self, button: &Button) {
         match button {
-            &Button::Keyboard(Key::Up) => {
-                let (x, y) = self.camera_pos;
-                self.camera_pos = (x, y - 1.0);
+            &Button::Keyboard(key) => {
+                self.keys.insert(key)
             },
-            &Button::Keyboard(Key::Down) => {
-                let (x, y) = self.camera_pos;
-                self.camera_pos = (x, y + 1.0);
-            },
-            &Button::Keyboard(Key::Left) => {
-                let (x, y) = self.camera_pos;
-                self.camera_pos = (x - 1.0, y);
-            },
-            &Button::Keyboard(Key::Right) => {
-                let (x, y) = self.camera_pos;
-                self.camera_pos = (x + 1.0, y);
-            },
-            _ => ()
-        }
+            _ => false
+        };
         //self.quit = true;
     }
 
     fn release(&mut self, button: &Button) {
+        match button {
+            &Button::Keyboard(key) => {
+                self.keys.remove(&key)
+            },
+            _ => false
+        };
     }
 }
