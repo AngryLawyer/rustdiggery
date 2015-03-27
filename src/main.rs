@@ -17,6 +17,7 @@ pub mod scene;
 pub mod scene_manager;
 pub mod title_scene;
 pub mod game_scene;
+pub mod entity;
 
 fn main() {
 

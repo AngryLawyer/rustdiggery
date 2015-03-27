@@ -5,26 +5,45 @@ use event::RenderArgs;
 use input::{Button, Key};
 use graphics;
 use graphics::RelativeTransform;
+use entity::{Entity, RcEntity};
 
 #[derive(Clone)]
 enum CellState {
     Empty,
     Dirt,
-    Stone
+    Stone,
+    Wall
 }
 
 struct World {
     cells: Vec<CellState>,
+    entities: Vec<RcEntity>,
     width: u32,
     height: u32
 }
 
 impl World {
     pub fn new(width: u32, height: u32) -> World {
+        let mut entities = vec![];
+        let mut cells = vec![CellState::Dirt; (width * height) as usize];
+        entities.push(Entity::new(1,1));
+        cells[1] = CellState::Empty;
+        cells[width as usize] = CellState::Empty;
+        cells[width as usize + 1] = CellState::Empty;
+        cells[width as usize + 2] = CellState::Empty;
+        cells[(width as usize * 2) + 1] = CellState::Empty;
+
         World {
-            cells: vec![CellState::Dirt; (width * height) as usize],
+            cells: cells,
+            entities: entities,
             width: width,
             height: height
+        }
+    }
+
+    pub fn render(&self, context: &graphics::Context, gl: &mut Gl) {
+        for entity in self.entities.iter() {
+            entity.borrow().render(context, gl);
         }
     }
 }
@@ -52,6 +71,7 @@ impl Scene for GameScene {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const BROWN: [f32; 4] = [0.2, 0.2, 0.0, 1.0];
         const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
+        const WHITE: [f32; 4] = [1.0; 4];
         const CELL_SIZE: u32 = 32;
 
         let (camera_x, camera_y) = self.camera_pos;
@@ -73,9 +93,13 @@ impl Scene for GameScene {
                     CellState::Stone => {
                         graphics::rectangle(GREY, graphics::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
                     },
+                    CellState::Wall => {
+                        graphics::rectangle(WHITE, graphics::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
+                    }
                     _ => ()
                 }
-            }
+            };
+            self.world.render(context, gl);
         });
 
     }
