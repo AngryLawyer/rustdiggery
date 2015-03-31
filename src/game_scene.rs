@@ -6,6 +6,8 @@ use input::{Button, Key};
 use graphics;
 use graphics::RelativeTransform;
 use entity::{Entity, RcEntity};
+use std::rc::Weak;
+use std::cell::RefCell;
 
 #[derive(Clone)]
 enum CellState {
@@ -18,6 +20,7 @@ enum CellState {
 struct World {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
+    player: Weak<RefCell<Entity>>,
     width: u32,
     height: u32
 }
@@ -26,7 +29,9 @@ impl World {
     pub fn new(width: u32, height: u32) -> World {
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        entities.push(Entity::new(1,1));
+        let player = Entity::new(1,1);
+        let borrow = player.downgrade();
+        entities.push(player);
         cells[1] = CellState::Empty;
         cells[width as usize] = CellState::Empty;
         cells[width as usize + 1] = CellState::Empty;
@@ -37,7 +42,8 @@ impl World {
             cells: cells,
             entities: entities,
             width: width,
-            height: height
+            height: height,
+            player: borrow
         }
     }
 

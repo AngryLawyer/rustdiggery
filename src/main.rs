@@ -1,3 +1,4 @@
+#![feature(alloc)];
 extern crate sdl2_window;
 extern crate window;
 extern crate shader_version;
