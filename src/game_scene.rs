@@ -112,7 +112,14 @@ impl Scene for GameScene {
 
     fn think(&mut self) -> Option<SceneCommand> {
 
-        for &key in self.keys.iter() {
+        match self.world.player.upgrade() {
+            Some(entity) => {
+                entity.borrow_mut().input(&self.keys)
+            },
+            None => ()
+        }
+
+        /*for &key in self.keys.iter() {
             match key {
                 Key::Up => {
                     let (x, y) = self.camera_pos;
@@ -132,7 +139,7 @@ impl Scene for GameScene {
                 },
                 _ => ()
             }
-        };
+        };*/
 
         if self.quit {
             Some(SceneCommand::PopScene)
