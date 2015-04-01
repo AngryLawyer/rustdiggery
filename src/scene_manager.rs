@@ -1,6 +1,6 @@
 use scene::{BoxedScene, SceneCommand};
 use opengl_graphics::Gl;
-use event::{RenderArgs};
+use event::{RenderArgs, UpdateArgs};
 use input::Button;
 
 pub struct SceneManager {
@@ -41,10 +41,10 @@ impl SceneManager {
         }
     }
 
-    pub fn think(&mut self)  {
+    pub fn think(&mut self, args: &UpdateArgs)  {
         match self.scene_stack.pop() {
             Some(mut scene) => {
-                let result = scene.think();
+                let result = scene.think(args);
                 self.scene_stack.push(scene);
                 self.handle_scene_command(result);
             },

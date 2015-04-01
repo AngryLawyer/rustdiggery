@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use scene::{Scene, BoxedScene, SceneCommand};
 use opengl_graphics::Gl;
-use event::RenderArgs;
+use event::{RenderArgs, UpdateArgs};
 use input::{Button, Key};
 use graphics;
 use graphics::RelativeTransform;
@@ -47,9 +47,9 @@ impl World {
         }
     }
 
-    pub fn render(&self, context: &graphics::Context, gl: &mut Gl) {
+    pub fn render(&self, context: &graphics::Context, gl: &mut Gl, tick: u64) {
         for entity in self.entities.iter() {
-            entity.borrow().render(context, gl);
+            entity.borrow().render(context, gl, tick);
         }
     }
 }
@@ -58,6 +58,7 @@ pub struct GameScene {
     quit: bool,
     world: World,
     keys: HashSet<Key>,
+    tick: u64,
     camera_pos: (f64, f64)
 }
 
@@ -67,6 +68,7 @@ impl GameScene {
             quit: false,
             world: World::new(100, 100),
             keys: HashSet::new(),
+            tick: 0,
             camera_pos: (0.0, 0.0)
         })
     }
@@ -105,19 +107,28 @@ impl Scene for GameScene {
                     _ => ()
                 }
             };
-            self.world.render(context, gl);
+            self.world.render(context, gl, self.tick);
         });
 
     }
 
-    fn think(&mut self) -> Option<SceneCommand> {
+    fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
+        self.tick += (args.dt * 100000.0) as u64;
 
-        match self.world.player.upgrade() {
-            Some(entity) => {
-                entity.borrow_mut().input(&self.keys)
-            },
-            None => ()
+        println!("{}, {}", args.dt, self.tick);
+
+        if self.tick / 1000 % 10 == 0 {
+            match self.world.player.upgrade() {
+                Some(entity) => {
+                    //Move existing
+                    entity.borrow_mut().think(self.tick);
+                    //Handle player input
+                    entity.borrow_mut().input(&self.keys);
+                },
+                None => ()
+            }
         }
+
 
         /*for &key in self.keys.iter() {
             match key {

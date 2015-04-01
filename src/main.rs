@@ -1,4 +1,4 @@
-#![feature(alloc)];
+#![feature(alloc)]
 extern crate sdl2_window;
 extern crate window;
 extern crate shader_version;
@@ -13,6 +13,7 @@ use event::{Events, RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 use opengl_graphics::Gl;
 
 use std::cell::RefCell;
+use std::rc::Rc;
 
 pub mod scene;
 pub mod scene_manager;
@@ -33,13 +34,13 @@ fn main() {
             samples: 4,
         }
     );
-    let window = RefCell::new(window);
+    let window = Rc::new(RefCell::new(window));
 
     let mut manager = scene_manager::SceneManager::new();
     let mut gl = Gl::new(opengl);
     manager.push_scene(title_scene::TitleScene::new());
     
-    for e in event::events(&window) {
+    for e in event::events(window) {
         if let Some(p) = e.press_args() {
             manager.press(&p);
         }
@@ -54,7 +55,7 @@ fn main() {
         if let Some(u) = e.update_args() {
             //app.update(&mut *window.borrow_mut(), &u);
             if manager.scene_count() > 0 {
-                manager.think();
+                manager.think(&u);
             } else {
                 break;
             }
