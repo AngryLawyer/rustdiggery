@@ -58,6 +58,7 @@ pub struct GameScene {
     quit: bool,
     world: World,
     keys: HashSet<Key>,
+    last_keypress: Option<Key>,
     tick: u64,
     camera_pos: (f64, f64)
 }
@@ -68,10 +69,24 @@ impl GameScene {
             quit: false,
             world: World::new(100, 100),
             keys: HashSet::new(),
+            last_keypress: None,
             tick: 0,
             camera_pos: (0.0, 0.0)
         })
     }
+
+    fn get_last_keypress(&self) -> Option<Key> {
+        for &key in self.keys.iter() {
+            match key {
+                Key::Up | Key::Down | Key::Left | Key::Right => {
+                    return Some(key);
+                },
+                _ => ()
+            }
+        };
+        None
+    }
+
 }
 
 impl Scene for GameScene {
@@ -111,11 +126,13 @@ impl Scene for GameScene {
         });
 
     }
-
     fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
 
-        println!("{}, {}", args.dt, self.tick);
+        match self.get_last_keypress() {
+            Some(key) => self.last_keypress = Some(key),
+            _ => ()
+        };
 
         if self.tick / 1000 % 10 == 0 {
             match self.world.player.upgrade() {
@@ -123,34 +140,14 @@ impl Scene for GameScene {
                     //Move existing
                     entity.borrow_mut().think(self.tick);
                     //Handle player input
-                    entity.borrow_mut().input(&self.keys);
+                    //FIXME: Make player input less painful
+                    entity.borrow_mut().input(&self.last_keypress);
+                    self.last_keypress = None;
                 },
                 None => ()
             }
         }
 
-
-        /*for &key in self.keys.iter() {
-            match key {
-                Key::Up => {
-                    let (x, y) = self.camera_pos;
-                    self.camera_pos = (x, y - 1.0);
-                },
-                Key::Down => {
-                    let (x, y) = self.camera_pos;
-                    self.camera_pos = (x, y + 1.0);
-                },
-                Key::Left => {
-                    let (x, y) = self.camera_pos;
-                    self.camera_pos = (x - 1.0, y);
-                },
-                Key::Right => {
-                    let (x, y) = self.camera_pos;
-                    self.camera_pos = (x + 1.0, y);
-                },
-                _ => ()
-            }
-        };*/
 
         if self.quit {
             Some(SceneCommand::PopScene)

@@ -70,24 +70,22 @@ impl Entity {
         self.y_movement = YMovement::NEUTRAL;
     }
 
-    pub fn input(&mut self, keys: &HashSet<Key>) {
-        for &key in keys.iter() {
-            match key {
-                Key::Up => {
-                    self.y_movement = YMovement::UP;
-                },
-                Key::Down => {
-                    self.y_movement = YMovement::DOWN;
-                },
-                Key::Left => {
-                    self.x_movement = XMovement::LEFT;
-                },
-                Key::Right => {
-                    self.x_movement = XMovement::RIGHT;
-                },
-                _ => ()
-            }
-        };
+    pub fn input(&mut self, key: &Option<Key>) {
+        match *key {
+            Some(Key::Up) => {
+                self.y_movement = YMovement::UP;
+            },
+            Some(Key::Down) => {
+                self.y_movement = YMovement::DOWN;
+            },
+            Some(Key::Left) => {
+                self.x_movement = XMovement::LEFT;
+            },
+            Some(Key::Right) => {
+                self.x_movement = XMovement::RIGHT;
+            },
+            _ => ()
+        }
     }
 }
 
