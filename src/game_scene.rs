@@ -4,9 +4,8 @@ use opengl_graphics::Gl;
 use event::{RenderArgs, UpdateArgs};
 use input::{Button, Key};
 use graphics;
-use graphics::RelativeTransform;
+use graphics::Transformed;
 use entity::{Entity, RcEntity};
-use std::rc::Weak;
 use std::cell::RefCell;
 
 #[derive(Clone)]
@@ -20,7 +19,7 @@ enum CellState {
 struct World {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
-    player: Weak<RefCell<Entity>>,
+    player: RcEntity,
     width: u32,
     height: u32
 }
@@ -30,7 +29,7 @@ impl World {
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
         let player = Entity::new(1,1);
-        let borrow = player.downgrade();
+        let borrow = player.clone();
         entities.push(player);
         cells[1] = CellState::Empty;
         cells[width as usize] = CellState::Empty;
@@ -135,17 +134,14 @@ impl Scene for GameScene {
         };
 
         if self.tick / 1000 % 10 == 0 {
-            match self.world.player.upgrade() {
-                Some(entity) => {
-                    //Move existing
-                    entity.borrow_mut().think(self.tick);
-                    //Handle player input
-                    //FIXME: Make player input less painful
-                    entity.borrow_mut().input(&self.last_keypress);
-                    self.last_keypress = None;
-                },
-                None => ()
-            }
+            //FIXME: Make this use weak references once we have them
+            let entity = self.world.player.clone();
+            //Move existing
+            entity.borrow_mut().think(self.tick);
+            //Handle player input
+            //FIXME: Make player input less painful
+            entity.borrow_mut().input(&self.last_keypress);
+            self.last_keypress = None;
         }
 
 

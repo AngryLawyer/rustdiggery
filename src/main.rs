@@ -1,4 +1,3 @@
-#![feature(alloc)]
 extern crate sdl2_window;
 extern crate window;
 extern crate shader_version;
@@ -26,13 +25,10 @@ fn main() {
     let opengl = shader_version::opengl::OpenGL::_3_2;
     let window = Window::new(
         opengl,
-        WindowSettings {
-            title: "Rustdiggery".to_string(),
-            size: [800, 600],
-            fullscreen: false,
-            exit_on_esc: false,
-            samples: 4,
-        }
+        WindowSettings::new(
+            "Rustdiggery".to_string(),
+            window::Size {width: 800, height: 600},
+        ).exit_on_esc(true)
     );
     let window = Rc::new(RefCell::new(window));
 
@@ -40,7 +36,7 @@ fn main() {
     let mut gl = Gl::new(opengl);
     manager.push_scene(title_scene::TitleScene::new());
     
-    for e in event::events(window) {
+    for e in window.events() {
         if let Some(p) = e.press_args() {
             manager.press(&p);
         }
