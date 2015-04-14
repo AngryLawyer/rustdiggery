@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use scene::{Scene, BoxedScene, SceneCommand};
 use opengl_graphics::Gl;
 use event::{RenderArgs, UpdateArgs};
@@ -6,6 +5,7 @@ use input::{Button, Key};
 use graphics;
 use graphics::Transformed;
 use entity::{Entity, RcEntity};
+use keyhandler::KeyHandler;
 use std::cell::RefCell;
 
 #[derive(Clone)]
@@ -56,8 +56,7 @@ impl World {
 pub struct GameScene {
     quit: bool,
     world: World,
-    keys: HashSet<Key>,
-    last_keypress: Option<Key>,
+    keyhandler: KeyHandler,
     tick: u64,
     camera_pos: (f64, f64)
 }
@@ -67,25 +66,11 @@ impl GameScene {
         Box::new(GameScene { 
             quit: false,
             world: World::new(100, 100),
-            keys: HashSet::new(),
-            last_keypress: None,
+            keyhandler: KeyHandler::new(),
             tick: 0,
             camera_pos: (0.0, 0.0)
         })
     }
-
-    fn get_last_keypress(&self) -> Option<Key> {
-        for &key in self.keys.iter() {
-            match key {
-                Key::Up | Key::Down | Key::Left | Key::Right => {
-                    return Some(key);
-                },
-                _ => ()
-            }
-        };
-        None
-    }
-
 }
 
 impl Scene for GameScene {
@@ -102,7 +87,7 @@ impl Scene for GameScene {
             .trans(((args.width / 2) - (CELL_SIZE / 2)) as f64, ((args.height / 2) - (CELL_SIZE / 2)) as f64) //Camera is in the centre of the screen
             .trans(-camera_x, -camera_y);
 
-        gl.draw([0, 0, args.width as i32, args.height as i32], |_, gl| {
+        gl.draw(args.viewport(), |_, gl| {
             graphics::clear(BLACK, gl);
             for (i, cell) in self.world.cells.iter().enumerate() {
                 let x = (i as u32 % self.world.width) * CELL_SIZE;
@@ -127,11 +112,7 @@ impl Scene for GameScene {
     }
     fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
-
-        match self.get_last_keypress() {
-            Some(key) => self.last_keypress = Some(key),
-            _ => ()
-        };
+        self.keyhandler.think(self.tick);
 
         if self.tick / 1000 % 10 == 0 {
             //FIXME: Make this use weak references once we have them
@@ -140,8 +121,12 @@ impl Scene for GameScene {
             entity.borrow_mut().think(self.tick);
             //Handle player input
             //FIXME: Make player input less painful
-            entity.borrow_mut().input(&self.last_keypress);
-            self.last_keypress = None;
+            match self.keyhandler.last_key() {
+                Some((key, tick)) => {
+                    entity.borrow_mut().input(key);
+                },
+                None => ()
+            }
         }
 
 
@@ -155,9 +140,9 @@ impl Scene for GameScene {
     fn press(&mut self, button: &Button) {
         match button {
             &Button::Keyboard(key) => {
-                self.keys.insert(key)
+                self.keyhandler.press(key)
             },
-            _ => false
+            _ => ()
         };
         //self.quit = true;
     }
@@ -165,9 +150,9 @@ impl Scene for GameScene {
     fn release(&mut self, button: &Button) {
         match button {
             &Button::Keyboard(key) => {
-                self.keys.remove(&key)
+                self.keyhandler.release(key)
             },
-            _ => false
+            _ => ()
         };
     }
 }
