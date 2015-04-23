@@ -1,6 +1,6 @@
 use scene::{Scene, BoxedScene, SceneCommand};
 use game_scene::GameScene;
-use opengl_graphics::Gl;
+use opengl_graphics::GlGraphics;
 use event::{RenderArgs, UpdateArgs};
 use input::Button;
 use graphics;
@@ -15,7 +15,7 @@ impl TitleScene {
 
 impl Scene for TitleScene {
 
-    fn render(&self, gl: &mut Gl, args: &RenderArgs) {
+    fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         graphics::clear([0.0, 0.0, 0.0, 1.0], gl);
     }
 

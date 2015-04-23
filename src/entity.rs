@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use input::Key;
 use std::rc::Rc;
 use std::cell::RefCell;
-use opengl_graphics::Gl;
+use opengl_graphics::GlGraphics;
 use graphics;
 
 pub enum XMovement {
@@ -36,7 +36,7 @@ impl Entity {
         }))
     }
 
-    pub fn render(&self, context: &graphics::Context, gl: &mut Gl, tick: u64) {
+    pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
         let real_tick = tick / 1000 % 10;
         let fraction = real_tick as f64 / 10.0;
 

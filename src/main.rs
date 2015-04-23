@@ -9,7 +9,7 @@ extern crate graphics;
 use sdl2_window::Sdl2Window as Window;
 use window::WindowSettings;
 use event::{Events, RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
-use opengl_graphics::Gl;
+use opengl_graphics::GlGraphics;
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -34,7 +34,7 @@ fn main() {
     let window = Rc::new(RefCell::new(window));
 
     let mut manager = scene_manager::SceneManager::new();
-    let mut gl = Gl::new(opengl);
+    let mut gl = GlGraphics::new(opengl);
     manager.push_scene(title_scene::TitleScene::new());
     
     for e in window.events() {

@@ -1,5 +1,5 @@
 use scene::{Scene, BoxedScene, SceneCommand};
-use opengl_graphics::Gl;
+use opengl_graphics::GlGraphics;
 use event::{RenderArgs, UpdateArgs};
 use input::{Button, Key};
 use graphics;
@@ -46,7 +46,7 @@ impl World {
         }
     }
 
-    pub fn render(&self, context: &graphics::Context, gl: &mut Gl, tick: u64) {
+    pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
         for entity in self.entities.iter() {
             entity.borrow().render(context, gl, tick);
         }
@@ -74,7 +74,7 @@ impl GameScene {
 }
 
 impl Scene for GameScene {
-    fn render(&self, gl: &mut Gl, args: &RenderArgs) {
+    fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const BROWN: [f32; 4] = [0.2, 0.2, 0.0, 1.0];
         const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];

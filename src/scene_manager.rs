@@ -1,5 +1,5 @@
 use scene::{BoxedScene, SceneCommand};
-use opengl_graphics::Gl;
+use opengl_graphics::GlGraphics;
 use event::{RenderArgs, UpdateArgs};
 use input::Button;
 
@@ -35,7 +35,7 @@ impl SceneManager {
         self.scene_stack.clear()
     }
 
-    pub fn render(&self, gl: &mut Gl, args: &RenderArgs) {
+    pub fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         if self.scene_stack.len() > 0 {
             self.scene_stack[self.scene_stack.len() - 1].render(gl, args);
         }
