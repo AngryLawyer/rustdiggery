@@ -38,12 +38,6 @@ impl KeyHandler {
                     self.keys.insert(*key, tick);
                 },
                 KeyState::Release => {
-                    match self.last_press {
-                        Some(last_key) if last_key == *key => {
-                            self.last_press = None
-                        },
-                        _ => ()
-                    };
                     self.keys.remove(key);
                 }
             }
@@ -51,14 +45,18 @@ impl KeyHandler {
         self.incoming.clear();
     }
 
-    pub fn last_key(&self) -> Option<(Key, u64)> {
+    pub fn last_key(&mut self) -> Option<(Key, u64)> {
         match self.last_press {
             Some(key) => {
                 match self.keys.get(&key) {
                     Some(timestamp) => {
                         Some((key, *timestamp))
                     },
-                    None => None
+                    None => {
+                        // Clear ourself out if we're not currently pressed
+                        self.last_press = None;
+                        Some((key, 0)) //FIXME: Should use a meaningful value
+                    }
                 }
             },
             None => None
