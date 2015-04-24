@@ -123,7 +123,10 @@ impl Scene for GameScene {
             //FIXME: Make player input less painful
             match self.keyhandler.last_key() {
                 Some((key, tick)) => {
-                    entity.borrow_mut().input(key);
+                    let difference = self.tick - tick;
+                    if difference < 8000 || difference > 20000 {
+                        entity.borrow_mut().input(key);
+                    }
                 },
                 None => ()
             }

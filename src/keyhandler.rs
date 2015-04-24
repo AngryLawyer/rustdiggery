@@ -8,7 +8,7 @@ enum KeyState {
 
 pub struct KeyHandler {
     incoming: Vec<(KeyState, Key)>,
-    last_press: Option<Key>,
+    last_press: Option<(Key, u64)>,
     keys: HashMap<Key, u64>
 }
 
@@ -34,7 +34,7 @@ impl KeyHandler {
         for &(ref state, ref key) in self.incoming.iter() {
             match *state {
                 KeyState::Press => {
-                    self.last_press = Some(*key);
+                    self.last_press = Some((*key, tick));
                     self.keys.insert(*key, tick);
                 },
                 KeyState::Release => {
@@ -47,15 +47,15 @@ impl KeyHandler {
 
     pub fn last_key(&mut self) -> Option<(Key, u64)> {
         match self.last_press {
-            Some(key) => {
+            Some((key, timestamp)) => {
                 match self.keys.get(&key) {
-                    Some(timestamp) => {
-                        Some((key, *timestamp))
+                    Some(_) => {
+                        Some((key, timestamp))
                     },
                     None => {
                         // Clear ourself out if we're not currently pressed
                         self.last_press = None;
-                        Some((key, 0)) //FIXME: Should use a meaningful value
+                        Some((key, timestamp))
                     }
                 }
             },
