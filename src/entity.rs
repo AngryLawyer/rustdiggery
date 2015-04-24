@@ -5,14 +5,10 @@ use std::cell::RefCell;
 use opengl_graphics::GlGraphics;
 use graphics;
 
-pub enum XMovement {
+pub enum Movement {
     NEUTRAL,
     LEFT,
-    RIGHT
-}
-
-pub enum YMovement {
-    NEUTRAL,
+    RIGHT,
     UP,
     DOWN
 }
@@ -20,9 +16,7 @@ pub enum YMovement {
 pub struct Entity {
     x: u32,
     y: u32,
-    x_movement: XMovement,
-    y_movement: YMovement
-
+    movement: Movement,
 }
 
 impl Entity {
@@ -31,8 +25,7 @@ impl Entity {
         Rc::new(RefCell::new(Entity {
             x: x,
             y: y,
-            x_movement: XMovement::NEUTRAL,
-            y_movement: YMovement::NEUTRAL
+            movement: Movement::NEUTRAL,
         }))
     }
 
@@ -40,14 +33,14 @@ impl Entity {
         let real_tick = tick / 1000 % 10;
         let fraction = real_tick as f64 / 10.0;
 
-        let predicted_x = (self.x * 32) as f64 + match self.x_movement {
-            XMovement::LEFT => { -32.0 * fraction } ,
-            XMovement::RIGHT => { 32.0 * fraction },
+        let predicted_x = (self.x * 32) as f64 + match self.movement {
+            Movement::LEFT => { -32.0 * fraction } ,
+            Movement::RIGHT => { 32.0 * fraction },
             _ => 0.0
         };
-        let predicted_y = (self.y * 32) as f64 + match self.y_movement {
-            YMovement::UP => { -32.0 * fraction } ,
-            YMovement::DOWN => { 32.0 * fraction },
+        let predicted_y = (self.y * 32) as f64 + match self.movement {
+            Movement::UP => { -32.0 * fraction } ,
+            Movement::DOWN => { 32.0 * fraction },
             _ => 0.0
         };
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
@@ -55,34 +48,29 @@ impl Entity {
     }
 
     pub fn think(&mut self, tick: u64) {
-        match self.x_movement {
-            XMovement::LEFT => { self.x -= 1},
-            XMovement::RIGHT => { self.x += 1},
+        match self.movement {
+            Movement::LEFT => { self.x -= 1},
+            Movement::RIGHT => { self.x += 1},
+            Movement::UP => { self.y -= 1},
+            Movement::DOWN => { self.y += 1},
             _ => ()
         };
-        self.x_movement = XMovement::NEUTRAL;
-
-        match self.y_movement {
-            YMovement::UP => { self.y -= 1},
-            YMovement::DOWN => { self.y += 1},
-            _ => ()
-        }
-        self.y_movement = YMovement::NEUTRAL;
+        self.movement = Movement::NEUTRAL;
     }
 
     pub fn input(&mut self, key: Key) {
         match key {
             Key::Up => {
-                self.y_movement = YMovement::UP;
+                self.movement = Movement::UP;
             },
             Key::Down => {
-                self.y_movement = YMovement::DOWN;
+                self.movement = Movement::DOWN;
             },
             Key::Left => {
-                self.x_movement = XMovement::LEFT;
+                self.movement = Movement::LEFT;
             },
             Key::Right => {
-                self.x_movement = XMovement::RIGHT;
+                self.movement = Movement::RIGHT;
             },
             _ => ()
         }

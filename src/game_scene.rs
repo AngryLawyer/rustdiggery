@@ -120,7 +120,6 @@ impl Scene for GameScene {
             //Move existing
             entity.borrow_mut().think(self.tick);
             //Handle player input
-            //FIXME: Make player input less painful
             match self.keyhandler.last_key() {
                 Some((key, tick)) => {
                     let difference = self.tick - tick;
