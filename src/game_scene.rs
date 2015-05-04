@@ -51,6 +51,16 @@ impl World {
             entity.borrow().render(context, gl, tick);
         }
     }
+
+    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
+        let index = x + (y * self.world.width);
+        return (self.world.cells[index], None);
+    }
+
+    pub fn set_pos(&mut self, x: u32, y: u32, state: CellState) {
+        let index = x + (y * self.world.width);
+        self.world.cells[index] = state;
+    }
 }
 
 pub struct GameScene {
@@ -65,7 +75,7 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene { 
             quit: false,
-            world: World::new(100, 100),
+            world: World::new(10, 10),
             keyhandler: KeyHandler::new(),
             tick: 0,
             camera_pos: (0.0, 0.0)
