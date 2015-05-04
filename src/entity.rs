@@ -74,16 +74,24 @@ impl Entity {
     pub fn input(&mut self, key: Key, adjacents: &Adjacents) {
         match key {
             Key::Up => {
-                self.y_movement = YMovement::UP;
+                if adjacents.top.is_some() {
+                    self.y_movement = YMovement::UP;
+                }
             },
             Key::Down => {
-                self.y_movement = YMovement::DOWN;
+                if adjacents.bottom.is_some() {
+                    self.y_movement = YMovement::DOWN;
+                }
             },
             Key::Left => {
-                self.x_movement = XMovement::LEFT;
+                if adjacents.left.is_some() {
+                    self.x_movement = XMovement::LEFT;
+                }
             },
             Key::Right => {
-                self.x_movement = XMovement::RIGHT;
+                if adjacents.right.is_some() {
+                    self.x_movement = XMovement::RIGHT;
+                }
             },
             _ => ()
         }

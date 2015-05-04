@@ -9,7 +9,7 @@ use keyhandler::KeyHandler;
 use std::cell::RefCell;
 
 #[derive(Clone)]
-enum CellState {
+pub enum CellState {
     Empty,
     Dirt,
     Stone,
@@ -25,10 +25,10 @@ struct World {
 }
 
 pub struct Adjacents { 
-    top: Option<(CellState, Option<RcEntity>)>,
-    left: Option<(CellState, Option<RcEntity>)>,
-    bottom: Option<(CellState, Option<RcEntity>)>,
-    right: Option<(CellState, Option<RcEntity>)>
+    pub top: Option<(CellState, Option<RcEntity>)>,
+    pub left: Option<(CellState, Option<RcEntity>)>,
+    pub bottom: Option<(CellState, Option<RcEntity>)>,
+    pub right: Option<(CellState, Option<RcEntity>)>
 }
 
 impl World {
