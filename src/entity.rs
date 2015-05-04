@@ -4,6 +4,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use opengl_graphics::GlGraphics;
 use graphics;
+use game_scene::Adjacents;
 
 pub enum XMovement {
     NEUTRAL,
@@ -18,8 +19,8 @@ pub enum YMovement {
 }
 
 pub struct Entity {
-    x: u32,
-    y: u32,
+    pub x: u32,
+    pub y: u32,
     x_movement: XMovement,
     y_movement: YMovement
 
@@ -54,7 +55,7 @@ impl Entity {
         graphics::rectangle(RED, graphics::rectangle::square(predicted_x, predicted_y, 32.0), context.transform, gl);
     }
 
-    pub fn think(&mut self, tick: u64) {
+    pub fn think(&mut self, tick: u64, adjacents: &Adjacents) {
         match self.x_movement {
             XMovement::LEFT => { self.x -= 1},
             XMovement::RIGHT => { self.x += 1},
@@ -70,7 +71,7 @@ impl Entity {
         self.y_movement = YMovement::NEUTRAL;
     }
 
-    pub fn input(&mut self, key: Key) {
+    pub fn input(&mut self, key: Key, adjacents: &Adjacents) {
         match key {
             Key::Up => {
                 self.y_movement = YMovement::UP;
