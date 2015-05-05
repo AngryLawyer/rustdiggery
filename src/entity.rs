@@ -4,6 +4,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use opengl_graphics::GlGraphics;
 use graphics;
+use game_scene::Adjacents;
 
 pub enum Movement {
     NEUTRAL,
@@ -14,8 +15,8 @@ pub enum Movement {
 }
 
 pub struct Entity {
-    x: u32,
-    y: u32,
+    pub x: u32,
+    pub y: u32,
     movement: Movement,
 }
 
@@ -53,24 +54,31 @@ impl Entity {
             Movement::RIGHT => { self.x += 1},
             Movement::UP => { self.y -= 1},
             Movement::DOWN => { self.y += 1},
-            _ => ()
         };
         self.movement = Movement::NEUTRAL;
     }
 
-    pub fn input(&mut self, key: Key) {
+    pub fn input(&mut self, key: Key, adjacents: &Adjacents) {
         match key {
             Key::Up => {
-                self.movement = Movement::UP;
+                if adjacents.top.is_some() {
+                    self.movement = Movement::UP;
+                }
             },
             Key::Down => {
-                self.movement = Movement::DOWN;
+                if adjacents.bottom.is_some() {
+                    self.movement = Movement::DOWN;
+                }
             },
             Key::Left => {
-                self.movement = Movement::LEFT;
+                if adjacents.left.is_some() {
+                    self.movement = Movement::LEFT;
+                }
             },
             Key::Right => {
-                self.movement = Movement::RIGHT;
+                if adjacents.right.is_some() {
+                    self.movement = Movement::RIGHT;
+                }
             },
             _ => ()
         }

@@ -9,7 +9,7 @@ use keyhandler::KeyHandler;
 use std::cell::RefCell;
 
 #[derive(Clone)]
-enum CellState {
+pub enum CellState {
     Empty,
     Dirt,
     Stone,
@@ -22,6 +22,13 @@ struct World {
     player: RcEntity,
     width: u32,
     height: u32
+}
+
+pub struct Adjacents { 
+    pub top: Option<(CellState, Option<RcEntity>)>,
+    pub left: Option<(CellState, Option<RcEntity>)>,
+    pub bottom: Option<(CellState, Option<RcEntity>)>,
+    pub right: Option<(CellState, Option<RcEntity>)>
 }
 
 impl World {
@@ -51,6 +58,44 @@ impl World {
             entity.borrow().render(context, gl, tick);
         }
     }
+
+    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
+        let index = x + (y * self.width);
+        return (self.cells[index as usize].clone(), None);
+    }
+    
+    pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
+        let top = if y > 0 {
+            Some(self.at_pos(x, y - 1))
+        } else {
+            None
+        };
+
+        let left = if x > 0 {
+            Some(self.at_pos(x - 1, y))
+        } else {
+            None
+        };
+
+        let bottom = if y < self.height - 1 {
+            Some(self.at_pos(x, y + 1))
+        } else {
+            None
+        };
+
+        let right = if x < self.width - 1 {
+            Some(self.at_pos(x + 1, y))
+        } else {
+            None
+        };
+
+        Adjacents{top: top, left: left, bottom: bottom, right: right}
+    }
+
+    pub fn set_pos(&mut self, x: u32, y: u32, state: CellState) {
+        let index = x + (y * self.width);
+        self.cells[index as usize] = state;
+    }
 }
 
 pub struct GameScene {
@@ -65,7 +110,7 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene { 
             quit: false,
-            world: World::new(100, 100),
+            world: World::new(10, 10),
             keyhandler: KeyHandler::new(),
             tick: 0,
             camera_pos: (0.0, 0.0)
@@ -117,14 +162,24 @@ impl Scene for GameScene {
         if self.tick / 1000 % 10 == 0 {
             //FIXME: Make this use weak references once we have them
             let entity = self.world.player.clone();
+            let mut entity = entity.borrow_mut();
             //Move existing
-            entity.borrow_mut().think(self.tick);
+            let x = entity.x;
+            let y = entity.y;
+            entity.think(self.tick, &self.world.adjacents(x, y));
+
+            let x = entity.x;
+            let y = entity.y;
+            self.world.set_pos(x, y, CellState::Empty);
+
             //Handle player input
             match self.keyhandler.last_key() {
                 Some((key, tick)) => {
                     let difference = self.tick - tick;
                     if difference < 8000 || difference > 20000 {
-                        entity.borrow_mut().input(key);
+                        let x = entity.x;
+                        let y = entity.y;
+                        entity.input(key, &self.world.adjacents(x, y));
                     }
                 },
                 None => ()
