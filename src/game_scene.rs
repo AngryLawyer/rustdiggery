@@ -16,6 +16,15 @@ pub enum CellState {
     Wall
 }
 
+impl CellState {
+    pub fn is_passable(&self) -> bool {
+        match *self {
+            CellState::Empty | CellState::Dirt => true,
+            _ => false
+        }
+    }
+}
+
 struct World {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
@@ -42,7 +51,7 @@ impl World {
         cells[width as usize] = CellState::Empty;
         cells[width as usize + 1] = CellState::Empty;
         cells[width as usize + 2] = CellState::Empty;
-        cells[(width as usize * 2) + 1] = CellState::Empty;
+        cells[(width as usize * 2) + 1] = CellState::Stone;
 
         World {
             cells: cells,

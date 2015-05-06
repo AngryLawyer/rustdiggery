@@ -48,12 +48,13 @@ impl Entity {
         graphics::rectangle(RED, graphics::rectangle::square(predicted_x, predicted_y, 32.0), context.transform, gl);
     }
 
-    pub fn think(&mut self, tick: u64) {
+    pub fn think(&mut self, tick: u64, adjacents: &Adjacents) {
         match self.movement {
             Movement::LEFT => { self.x -= 1},
             Movement::RIGHT => { self.x += 1},
             Movement::UP => { self.y -= 1},
             Movement::DOWN => { self.y += 1},
+            _ => {}
         };
         self.movement = Movement::NEUTRAL;
     }
@@ -61,23 +62,35 @@ impl Entity {
     pub fn input(&mut self, key: Key, adjacents: &Adjacents) {
         match key {
             Key::Up => {
-                if adjacents.top.is_some() {
-                    self.movement = Movement::UP;
+                match adjacents.top {
+                    Some((ref tile, _)) if tile.is_passable() => {
+                        self.movement = Movement::UP;
+                    },
+                    _ => ()
                 }
             },
             Key::Down => {
-                if adjacents.bottom.is_some() {
-                    self.movement = Movement::DOWN;
+                match adjacents.bottom {
+                    Some((ref tile, _)) if tile.is_passable() => {
+                        self.movement = Movement::DOWN;
+                    },
+                    _ => ()
                 }
             },
             Key::Left => {
-                if adjacents.left.is_some() {
-                    self.movement = Movement::LEFT;
+                match adjacents.left {
+                    Some((ref tile, _)) if tile.is_passable() => {
+                        self.movement = Movement::LEFT;
+                    },
+                    _ => ()
                 }
             },
             Key::Right => {
-                if adjacents.right.is_some() {
-                    self.movement = Movement::RIGHT;
+                match adjacents.right {
+                    Some((ref tile, _)) if tile.is_passable() => {
+                        self.movement = Movement::RIGHT;
+                    },
+                    _ => ()
                 }
             },
             _ => ()
