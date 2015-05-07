@@ -125,6 +125,12 @@ impl GameScene {
             camera_pos: (0.0, 0.0)
         })
     }
+
+    fn adjust_camera_position(&mut self) {
+        let (old_x * 32.0, old_y * 32.0) = self.camera_pos;
+        let player = self.world.player.borrow();
+        self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
+    }
 }
 
 impl Scene for GameScene {
@@ -164,37 +170,41 @@ impl Scene for GameScene {
         });
 
     }
+
     fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
         self.keyhandler.think(self.tick);
 
         if self.tick / 1000 % 10 == 0 {
-            //FIXME: Make this use weak references once we have them
-            let entity = self.world.player.clone();
-            let mut entity = entity.borrow_mut();
-            //Move existing
-            let x = entity.x;
-            let y = entity.y;
-            entity.think(self.tick, &self.world.adjacents(x, y));
+            {
+                //FIXME: Make this use weak references once we have them
+                let entity = self.world.player.clone();
+                let mut entity = entity.borrow_mut();
+                //Move existing
+                let x = entity.x;
+                let y = entity.y;
+                entity.think(self.tick, &self.world.adjacents(x, y));
 
-            let x = entity.x;
-            let y = entity.y;
-            self.world.set_pos(x, y, CellState::Empty);
+                let x = entity.x;
+                let y = entity.y;
+                self.world.set_pos(x, y, CellState::Empty);
 
-            //Handle player input
-            match self.keyhandler.last_key() {
-                Some((key, tick)) => {
-                    let difference = self.tick - tick;
-                    if difference < 8000 || difference > 20000 {
-                        let x = entity.x;
-                        let y = entity.y;
-                        entity.input(key, &self.world.adjacents(x, y));
-                    }
-                },
-                None => ()
+                //Handle player input
+                match self.keyhandler.last_key() {
+                    Some((key, tick)) => {
+                        let difference = self.tick - tick;
+                        if difference < 8000 || difference > 20000 {
+                            let x = entity.x;
+                            let y = entity.y;
+                            entity.input(key, &self.world.adjacents(x, y));
+                        }
+                    },
+                    None => ()
+                }
             }
-        }
 
+            self.adjust_camera_position();
+        }
 
         if self.quit {
             Some(SceneCommand::PopScene)
