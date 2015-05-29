@@ -112,6 +112,7 @@ pub struct GameScene {
     world: World,
     keyhandler: KeyHandler,
     tick: u64,
+    next_think: u64,
     camera_pos: (f64, f64)
 }
 
@@ -122,12 +123,13 @@ impl GameScene {
             world: World::new(10, 10),
             keyhandler: KeyHandler::new(),
             tick: 0,
+            next_think: 0,
             camera_pos: (0.0, 0.0)
         })
     }
 
     fn adjust_camera_position(&mut self) {
-        let (old_x * 32.0, old_y * 32.0) = self.camera_pos;
+        let (old_x, old_y) = self.camera_pos;
         let player = self.world.player.borrow();
         self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
     }
@@ -175,7 +177,8 @@ impl Scene for GameScene {
         self.tick += (args.dt * 100000.0) as u64;
         self.keyhandler.think(self.tick);
 
-        if self.tick / 1000 % 10 == 0 {
+        if self.tick >= self.next_think {
+            self.next_think += 10000;
             {
                 //FIXME: Make this use weak references once we have them
                 let entity = self.world.player.clone();
