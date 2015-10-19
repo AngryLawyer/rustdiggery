@@ -1,43 +1,41 @@
-extern crate sdl2_window;
-extern crate window;
-extern crate shader_version;
-extern crate event;
-extern crate input;
-extern crate opengl_graphics;
-extern crate graphics;
+extern crate piston_window;
 
-use sdl2_window::Sdl2Window as Window;
-use window::WindowSettings;
-use event::{Events, RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
-use opengl_graphics::GlGraphics;
+use piston_window::*;
 
-use std::cell::RefCell;
-use std::rc::Rc;
-
-pub mod scene;
+/*pub mod scene;
 pub mod scene_manager;
 pub mod title_scene;
 pub mod game_scene;
 pub mod entity;
-pub mod keyhandler;
+pub mod keyhandler;*/
 
 fn main() {
 
-    let opengl = shader_version::opengl::OpenGL::_3_2;
-    let window = Window::new(
-        opengl,
-        WindowSettings::new(
-            "Rustdiggery".to_string(),
-            window::Size {width: 800, height: 600},
-        ).exit_on_esc(true)
-    );
-    let window = Rc::new(RefCell::new(window));
+    let opengl = OpenGL::V3_2;
+    let (width, height) = (800, 600);
+    let window: PistonWindow =
+        WindowSettings::new("Rustdigery", (width, height))
+        .exit_on_esc(true)
+        .opengl(opengl)
+        .build()
+        .unwrap();
 
-    let mut manager = scene_manager::SceneManager::new();
-    let mut gl = GlGraphics::new(opengl);
-    manager.push_scene(title_scene::TitleScene::new());
+    //let window = Rc::new(RefCell::new(window));
+    //let ref mut gl = GlGraphics::new(opengl);
+
+    //let mut manager = scene_manager::SceneManager::new();
+    //manager.push_scene(title_scene::TitleScene::new());
     
-    for e in window.events() {
+    for e in window {
+        if let Some(button) = e.press_args() {
+            //manager.press(&p);
+        }
+
+        if let Some(button) = e.release_args() {
+            //manager.release(&p);
+        }
+    }
+    /*for e in window.events() {
         if let Some(p) = e.press_args() {
             manager.press(&p);
         }
@@ -57,5 +55,5 @@ fn main() {
                 break;
             }
         }
-    }
+    }*/
 }

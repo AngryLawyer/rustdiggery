@@ -4,23 +4,5 @@ name = "rustdiggery"
 version = "0.0.1"
 authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
 
-[dependencies.pistoncore-input]
-git = "https://github.com/PistonDevelopers/input"
-
-[dependencies.pistoncore-event]
-git = "https://github.com/pistondevelopers/event"
-
-[dependencies.pistoncore-window]
-git = "https://github.com/pistondevelopers/window"
-
-[dependencies.pistoncore-sdl2_window]
-git = "https://github.com/pistondevelopers/sdl2_window"
-
-[dependencies.piston2d-opengl_graphics]
-git = "https://github.com/pistondevelopers/opengl_graphics"
-
-[dependencies.piston2d-graphics]
-git = "https://github.com/pistondevelopers/graphics"
-
-[dependencies.shader_version]
-git = "https://github.com/PistonDevelopers/shader_version.git"
+[dependencies]
+piston_window = "0.15.0"
