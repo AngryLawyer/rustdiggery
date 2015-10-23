@@ -1,11 +1,12 @@
 use scene::{Scene, BoxedScene, SceneCommand};
-use opengl_graphics::GlGraphics;
-use event::{RenderArgs, UpdateArgs};
-use input::{Button, Key};
-use graphics;
-use graphics::Transformed;
-use entity::{Entity, RcEntity};
-use keyhandler::KeyHandler;
+use piston_window::{PistonWindow, UpdateArgs, UpdateEvent};
+//use opengl_graphics::GlGraphics;
+//use event::{RenderArgs, UpdateArgs};
+//use input::{Button, Key};
+//use graphics;
+//use graphics::Transformed;
+//use entity::{Entity, RcEntity};
+//use keyhandler::KeyHandler;
 use std::cell::RefCell;
 
 #[derive(Clone)]
@@ -25,7 +26,7 @@ impl CellState {
     }
 }
 
-struct World {
+/*struct World {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
     player: RcEntity,
@@ -105,12 +106,12 @@ impl World {
         let index = x + (y * self.width);
         self.cells[index as usize] = state;
     }
-}
+}*/
 
 pub struct GameScene {
     quit: bool,
-    world: World,
-    keyhandler: KeyHandler,
+    //world: World,
+    //keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
     camera_pos: (f64, f64)
@@ -120,23 +121,21 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene { 
             quit: false,
-            world: World::new(10, 10),
-            keyhandler: KeyHandler::new(),
+            //world: World::new(10, 10),
+            //keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
             camera_pos: (0.0, 0.0)
         })
     }
 
-    fn adjust_camera_position(&mut self) {
+    /*fn adjust_camera_position(&mut self) {
         let (old_x, old_y) = self.camera_pos;
         let player = self.world.player.borrow();
         self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
-    }
-}
+    }*/
 
-impl Scene for GameScene {
-    fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
+    fn render(&self, context: Context, gl: &mut GfxGraphics) {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const BROWN: [f32; 4] = [0.2, 0.2, 0.0, 1.0];
         const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
@@ -145,7 +144,7 @@ impl Scene for GameScene {
 
         let (camera_x, camera_y) = self.camera_pos;
 
-        let context = &graphics::Context::abs(args.width as f64, args.height as f64)
+        /*let context = &graphics::Context::abs(args.width as f64, args.height as f64)
             .trans(((args.width / 2) - (CELL_SIZE / 2)) as f64, ((args.height / 2) - (CELL_SIZE / 2)) as f64) //Camera is in the centre of the screen
             .trans(-camera_x, -camera_y);
 
@@ -169,19 +168,19 @@ impl Scene for GameScene {
                 }
             };
             self.world.render(context, gl, self.tick);
-        });
+        });*/
 
     }
 
     fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
-        self.keyhandler.think(self.tick);
+        //self.keyhandler.think(self.tick);
 
         if self.tick >= self.next_think {
             self.next_think += 10000;
             {
                 //FIXME: Make this use weak references once we have them
-                let entity = self.world.player.clone();
+                /*let entity = self.world.player.clone();
                 let mut entity = entity.borrow_mut();
                 //Move existing
                 let x = entity.x;
@@ -203,10 +202,10 @@ impl Scene for GameScene {
                         }
                     },
                     None => ()
-                }
+                }*/
             }
 
-            self.adjust_camera_position();
+            //self.adjust_camera_position();
         }
 
         if self.quit {
@@ -216,7 +215,7 @@ impl Scene for GameScene {
         }
     }
 
-    fn press(&mut self, button: &Button) {
+    /*fn press(&mut self, button: &Button) {
         match button {
             &Button::Keyboard(key) => {
                 self.keyhandler.press(key)
@@ -233,5 +232,15 @@ impl Scene for GameScene {
             },
             _ => ()
         };
+    }*/
+}
+
+impl Scene for GameScene {
+    fn handle_event(&mut self, e: &PistonWindow) -> Option<SceneCommand> {
+        if let Some(u) = e.update_args() {
+            self.think(&u)
+        } else {
+            None
+        }
     }
 }

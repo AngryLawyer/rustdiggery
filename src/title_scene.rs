@@ -1,9 +1,5 @@
 use scene::{Scene, BoxedScene, SceneCommand};
-use game_scene::GameScene;
-use opengl_graphics::GlGraphics;
-use event::{RenderArgs, UpdateArgs};
-use input::Button;
-use graphics;
+use piston_window::*;
 
 pub struct TitleScene;
 
@@ -15,15 +11,10 @@ impl TitleScene {
 
 impl Scene for TitleScene {
 
-    fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
-        graphics::clear([0.0, 0.0, 0.0, 1.0], gl);
+    fn handle_event(&mut self, e: &PistonWindow) -> Option<SceneCommand> {
+        e.draw_2d(|_c, g| {
+            clear([0.0, 0.0, 0.0, 1.0], g);
+        });
+        None
     }
-
-    fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
-        println!("Hello, world!");
-        Some(SceneCommand::SetScene(GameScene::new()))
-    }
-    
-    fn press(&mut self, button: &Button) {}
-    fn release(&mut self, button: &Button) {}
 }

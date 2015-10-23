@@ -1,7 +1,8 @@
 use scene::{BoxedScene, SceneCommand};
-use opengl_graphics::GlGraphics;
-use event::{RenderArgs, UpdateArgs};
-use input::Button;
+use piston_window::PistonWindow;
+//use opengl_graphics::GlGraphics;
+//use event::{RenderArgs, UpdateArgs};
+//use input::Button;
 
 pub struct SceneManager {
     scene_stack: Vec<BoxedScene>
@@ -35,7 +36,10 @@ impl SceneManager {
         self.scene_stack.clear()
     }
 
-    pub fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
+    pub fn handle_event(&mut self, e: &PistonWindow) {
+    }
+
+    /*pub fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         if self.scene_stack.len() > 0 {
             self.scene_stack[self.scene_stack.len() - 1].render(gl, args);
         }
@@ -50,9 +54,9 @@ impl SceneManager {
             },
             None => ()
         }
-    }
+    }*/
 
-    pub fn press(&mut self, args: &Button) {
+    /*pub fn press(&mut self, args: &Button) {
         match self.scene_stack.pop() {
             Some(mut scene) => {
                 scene.press(args);
@@ -70,7 +74,7 @@ impl SceneManager {
             },
             None => ()
         }
-    }
+    }*/
 
     fn handle_scene_command(&mut self, command: Option<SceneCommand>) {
         match command {

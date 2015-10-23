@@ -1,12 +1,10 @@
-use opengl_graphics::GlGraphics;
-use event::{RenderArgs, UpdateArgs};
-use input::Button;
+use piston_window::PistonWindow;
+//use opengl_graphics::GlGraphics;
+//use event::{RenderArgs, UpdateArgs};
+//use input::Button;
 
 pub trait Scene {
-    fn render(&self, gl: &mut GlGraphics, args: &RenderArgs);
-    fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand>;
-    fn press(&mut self, button: &Button);
-    fn release(&mut self, button: &Button);
+    fn handle_event(&mut self, e: &PistonWindow) -> Option<SceneCommand>;
 }
 
 pub type BoxedScene = Box<Scene + 'static>;
