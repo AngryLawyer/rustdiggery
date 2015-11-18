@@ -21,8 +21,8 @@ fn main() {
         .unwrap();
 
     let mut manager = scene_manager::SceneManager::new();
-    manager.push_scene(title_scene::TitleScene::new());
-    
+    manager.push_scene(game_scene::GameScene::new());
+
     for e in window {
         manager.handle_event(&e);
         if let Some(_u) = e.update_args() {

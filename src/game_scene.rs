@@ -1,9 +1,7 @@
 use scene::{Scene, BoxedScene, SceneCommand};
-use piston_window::{PistonWindow, UpdateArgs, UpdateEvent};
-//use opengl_graphics::GlGraphics;
+use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d};
 //use event::{RenderArgs, UpdateArgs};
 //use input::{Button, Key};
-//use graphics;
 //use graphics::Transformed;
 //use entity::{Entity, RcEntity};
 //use keyhandler::KeyHandler;
@@ -34,7 +32,7 @@ impl CellState {
     height: u32
 }
 
-pub struct Adjacents { 
+pub struct Adjacents {
     pub top: Option<(CellState, Option<RcEntity>)>,
     pub left: Option<(CellState, Option<RcEntity>)>,
     pub bottom: Option<(CellState, Option<RcEntity>)>,
@@ -73,7 +71,7 @@ impl World {
         let index = x + (y * self.width);
         return (self.cells[index as usize].clone(), None);
     }
-    
+
     pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
         let top = if y > 0 {
             Some(self.at_pos(x, y - 1))
@@ -119,7 +117,7 @@ pub struct GameScene {
 
 impl GameScene {
     pub fn new() -> BoxedScene {
-        Box::new(GameScene { 
+        Box::new(GameScene {
             quit: false,
             //world: World::new(10, 10),
             //keyhandler: KeyHandler::new(),
@@ -135,7 +133,7 @@ impl GameScene {
         self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
     }*/
 
-    fn render(&self, context: Context, gl: &mut GfxGraphics) {
+    fn render(&self, context: Context, gl: &mut G2d) {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const BROWN: [f32; 4] = [0.2, 0.2, 0.0, 1.0];
         const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
@@ -240,6 +238,9 @@ impl Scene for GameScene {
         if let Some(u) = e.update_args() {
             self.think(&u)
         } else {
+            e.draw_2d(|context, g| {
+                self.render(context, g);
+            });
             None
         }
     }
