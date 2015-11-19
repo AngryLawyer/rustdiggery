@@ -1,5 +1,6 @@
 use scene::{Scene, BoxedScene, SceneCommand};
-use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d};
+use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d, Transformed};
+use piston_window;
 //use event::{RenderArgs, UpdateArgs};
 //use input::{Button, Key};
 //use graphics::Transformed;
@@ -24,28 +25,28 @@ impl CellState {
     }
 }
 
-/*struct World {
+struct World {
     cells: Vec<CellState>,
-    entities: Vec<RcEntity>,
-    player: RcEntity,
+    //entities: Vec<RcEntity>,
+    //player: RcEntity,
     width: u32,
     height: u32
 }
 
-pub struct Adjacents {
+/*pub struct Adjacents {
     pub top: Option<(CellState, Option<RcEntity>)>,
     pub left: Option<(CellState, Option<RcEntity>)>,
     pub bottom: Option<(CellState, Option<RcEntity>)>,
     pub right: Option<(CellState, Option<RcEntity>)>
-}
+}*/
 
 impl World {
     pub fn new(width: u32, height: u32) -> World {
-        let mut entities = vec![];
+        //let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        let player = Entity::new(1,1);
-        let borrow = player.clone();
-        entities.push(player);
+        //let player = Entity::new(1,1);
+        //let borrow = player.clone();
+        //entities.push(player);
         cells[1] = CellState::Empty;
         cells[width as usize] = CellState::Empty;
         cells[width as usize + 1] = CellState::Empty;
@@ -54,25 +55,25 @@ impl World {
 
         World {
             cells: cells,
-            entities: entities,
+            //entities: entities,
             width: width,
             height: height,
-            player: borrow
+            //player: borrow
         }
     }
 
-    pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
+    /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
         for entity in self.entities.iter() {
             entity.borrow().render(context, gl, tick);
         }
-    }
+    }*/
 
-    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
+    /*pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
         let index = x + (y * self.width);
         return (self.cells[index as usize].clone(), None);
-    }
+    }*/
 
-    pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
+    /*pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
         let top = if y > 0 {
             Some(self.at_pos(x, y - 1))
         } else {
@@ -98,17 +99,17 @@ impl World {
         };
 
         Adjacents{top: top, left: left, bottom: bottom, right: right}
-    }
+    }*/
 
     pub fn set_pos(&mut self, x: u32, y: u32, state: CellState) {
         let index = x + (y * self.width);
         self.cells[index as usize] = state;
     }
-}*/
+}
 
 pub struct GameScene {
     quit: bool,
-    //world: World,
+    world: World,
     //keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
@@ -119,7 +120,7 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene {
             quit: false,
-            //world: World::new(10, 10),
+            world: World::new(10, 10),
             //keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
@@ -141,32 +142,33 @@ impl GameScene {
         const CELL_SIZE: u32 = 32;
 
         let (camera_x, camera_y) = self.camera_pos;
+        piston_window::clear(BLACK, gl);
+        let size = context.get_view_size();
+        let width = size[0];
+        let height = size[1];
 
-        /*let context = &graphics::Context::abs(args.width as f64, args.height as f64)
-            .trans(((args.width / 2) - (CELL_SIZE / 2)) as f64, ((args.height / 2) - (CELL_SIZE / 2)) as f64) //Camera is in the centre of the screen
+        let context = context
+            .trans(((width as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64, ((height as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64) //Camera is in the centre of the screen
             .trans(-camera_x, -camera_y);
 
-        gl.draw(args.viewport(), |_, gl| {
-            graphics::clear(BLACK, gl);
-            for (i, cell) in self.world.cells.iter().enumerate() {
-                let x = (i as u32 % self.world.width) * CELL_SIZE;
-                let y = (i as u32 / self.world.height) * CELL_SIZE;
+        for (i, cell) in self.world.cells.iter().enumerate() {
+            let x = (i as u32 % self.world.width) * CELL_SIZE;
+            let y = (i as u32 / self.world.height) * CELL_SIZE;
 
-                match *cell {
-                    CellState::Dirt => {
-                        graphics::rectangle(BROWN, graphics::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                    },
-                    CellState::Stone => {
-                        graphics::rectangle(GREY, graphics::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                    },
-                    CellState::Wall => {
-                        graphics::rectangle(WHITE, graphics::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                    }
-                    _ => ()
+            match *cell {
+                CellState::Dirt => {
+                    piston_window::rectangle(BROWN, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
+                },
+                CellState::Stone => {
+                    piston_window::rectangle(GREY, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
+                },
+                CellState::Wall => {
+                    piston_window::rectangle(WHITE, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
                 }
-            };
-            self.world.render(context, gl, self.tick);
-        });*/
+                _ => ()
+            }
+        };
+        //self.world.render(context, gl, self.tick);
 
     }
 
