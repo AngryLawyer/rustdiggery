@@ -1,4 +1,6 @@
 extern crate piston_window;
+#[macro_use]
+extern crate ecs;
 
 use piston_window::*;
 

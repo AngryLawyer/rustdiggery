@@ -1,12 +1,24 @@
 use scene::{Scene, BoxedScene, SceneCommand};
 use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d, Transformed};
 use piston_window;
-//use event::{RenderArgs, UpdateArgs};
-//use input::{Button, Key};
-//use graphics::Transformed;
-//use entity::{Entity, RcEntity};
-//use keyhandler::KeyHandler;
 use std::cell::RefCell;
+use ecs::World;
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Position {
+    pub x: u32,
+    pub y: u32,
+}
+
+components! {
+    struct MyComponents {
+        #[hot] position: Position
+    };
+}
+
+systems! {
+    struct MySystems<MyComponents, ()>;
+}
 
 #[derive(Clone)]
 pub enum CellState {
@@ -25,8 +37,9 @@ impl CellState {
     }
 }
 
-struct World {
+struct Map {
     cells: Vec<CellState>,
+    world: World<MySystems>,
     //entities: Vec<RcEntity>,
     //player: RcEntity,
     width: u32,
@@ -40,8 +53,8 @@ struct World {
     pub right: Option<(CellState, Option<RcEntity>)>
 }*/
 
-impl World {
-    pub fn new(width: u32, height: u32) -> World {
+impl Map {
+    pub fn new(width: u32, height: u32) -> Map{
         //let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
         //let player = Entity::new(1,1);
@@ -52,9 +65,13 @@ impl World {
         cells[width as usize + 1] = CellState::Empty;
         cells[width as usize + 2] = CellState::Empty;
         cells[(width as usize * 2) + 1] = CellState::Stone;
+        let mut world = World::<MySystems>::new();
+        let entity = world.create_entity(());
+        println!("{:?}", entity);
 
-        World {
+        Map {
             cells: cells,
+            world: world,
             //entities: entities,
             width: width,
             height: height,
@@ -109,7 +126,7 @@ impl World {
 
 pub struct GameScene {
     quit: bool,
-    world: World,
+    map: Map,
     //keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
@@ -120,7 +137,7 @@ impl GameScene {
     pub fn new() -> BoxedScene {
         Box::new(GameScene {
             quit: false,
-            world: World::new(10, 10),
+            map: Map::new(10, 10),
             //keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
@@ -151,9 +168,9 @@ impl GameScene {
             .trans(((width as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64, ((height as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64) //Camera is in the centre of the screen
             .trans(-camera_x, -camera_y);
 
-        for (i, cell) in self.world.cells.iter().enumerate() {
-            let x = (i as u32 % self.world.width) * CELL_SIZE;
-            let y = (i as u32 / self.world.height) * CELL_SIZE;
+        for (i, cell) in self.map.cells.iter().enumerate() {
+            let x = (i as u32 % self.map.width) * CELL_SIZE;
+            let y = (i as u32 / self.map.height) * CELL_SIZE;
 
             match *cell {
                 CellState::Dirt => {

@@ -6,3 +6,4 @@ authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
 
 [dependencies]
 piston_window = "0.15.0"
+ecs = "*"

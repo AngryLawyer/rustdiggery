@@ -37,44 +37,15 @@ impl SceneManager {
     }
 
     pub fn handle_event(&mut self, e: &PistonWindow) {
-    }
-
-    /*pub fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
-        if self.scene_stack.len() > 0 {
-            self.scene_stack[self.scene_stack.len() - 1].render(gl, args);
-        }
-    }
-
-    pub fn think(&mut self, args: &UpdateArgs)  {
         match self.scene_stack.pop() {
             Some(mut scene) => {
-                let result = scene.think(args);
+                let result = scene.handle_event(e);
                 self.scene_stack.push(scene);
                 self.handle_scene_command(result);
             },
             None => ()
         }
-    }*/
-
-    /*pub fn press(&mut self, args: &Button) {
-        match self.scene_stack.pop() {
-            Some(mut scene) => {
-                scene.press(args);
-                self.scene_stack.push(scene);
-            },
-            None => ()
-        }
     }
-
-    pub fn release(&mut self, args: &Button) {
-        match self.scene_stack.pop() {
-            Some(mut scene) => {
-                scene.release(args);
-                self.scene_stack.push(scene);
-            },
-            None => ()
-        }
-    }*/
 
     fn handle_scene_command(&mut self, command: Option<SceneCommand>) {
         match command {
