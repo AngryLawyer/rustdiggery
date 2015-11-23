@@ -2,7 +2,7 @@ use scene::{Scene, BoxedScene, SceneCommand};
 use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d, Transformed};
 use piston_window;
 use std::cell::RefCell;
-use ecs::World;
+use ecs::{World, BuildData, System, Process, DataHelper};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Position {
@@ -13,11 +13,21 @@ pub struct Position {
 components! {
     struct MyComponents {
         #[hot] position: Position
-    };
+    }
+}
+
+pub struct PrintMessage(pub String);
+impl System for PrintMessage { type Components = MyComponents; type Services = (); }
+impl Process for PrintMessage {
+    fn process(&mut self, _: &mut DataHelper<MyComponents, ()>) {
+        println!("{}", &self.0);
+    }
 }
 
 systems! {
-    struct MySystems<MyComponents, ()>;
+    struct MySystems<MyComponents, ()> {
+        print_msg: PrintMessage = PrintMessage("Hello World".to_string())
+    }
 }
 
 #[derive(Clone)]
@@ -66,7 +76,9 @@ impl Map {
         cells[width as usize + 2] = CellState::Empty;
         cells[(width as usize * 2) + 1] = CellState::Stone;
         let mut world = World::<MySystems>::new();
-        let entity = world.create_entity(());
+        let entity = world.create_entity(|entity: BuildData<MyComponents>, data: &mut MyComponents| {
+            data.position.add(&entity, Position { x: 0, y: 0 });
+        });
         println!("{:?}", entity);
 
         Map {
@@ -196,6 +208,7 @@ impl GameScene {
         if self.tick >= self.next_think {
             self.next_think += 10000;
             {
+                self.map.world.update();
                 //FIXME: Make this use weak references once we have them
                 /*let entity = self.world.player.clone();
                 let mut entity = entity.borrow_mut();
