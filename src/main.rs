@@ -1,36 +1,35 @@
-extern crate piston_window;
-#[macro_use]
-extern crate ecs;
+extern crate sdl2;
+extern crate sdl2_engine_helpers;
 
-use piston_window::*;
-
-pub mod scene;
-pub mod scene_manager;
-pub mod title_scene;
-pub mod game_scene;
+//pub mod scene;
+//pub mod scene_manager;
+//pub mod title_scene;
+//pub mod game_scene;
 //pub mod entity;
 //pub mod keyhandler;
+use sdl2_engine_helpers::game_loop::GameLoop;
+use sdl2::pixels::Color;
 
 fn main() {
-
-    let opengl = OpenGL::V3_2;
-    let (width, height) = (800, 600);
-    let window: PistonWindow =
-        WindowSettings::new("Rustdigery", (width, height))
-        .exit_on_esc(true)
-        .opengl(opengl)
+    let sdl_context = sdl2::init().expect("Could not initialize SDL context");
+    let video_subsystem = sdl_context.video().expect("CVould not initialize video subsystem");
+    let window = video_subsystem.window("RustDiggery", 800, 600)
+        .position_centered()
+        .opengl()
         .build()
-        .unwrap();
+        .expect("Could not build window");
 
-    let mut manager = scene_manager::SceneManager::new();
-    manager.push_scene(game_scene::GameScene::new());
+    let mut canvas = window.into_canvas()
+        .present_vsync()
+        .build()
+        .expect("Could not get Canvas");
 
-    for e in window {
-        manager.handle_event(&e);
-        if let Some(_u) = e.update_args() {
-            if manager.scene_count() == 0 {
-                break;
-            }
-        }
-    }
+    let mut game_loop = GameLoop::new(60);
+    game_loop.run(|frame_number| {
+        let color = (frame_number % 256) as u8;
+        canvas.set_draw_color(Color::RGB(color, color, color));
+        canvas.clear();
+        canvas.present();
+        false
+    });
 }

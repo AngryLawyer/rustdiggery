@@ -5,5 +5,5 @@ version = "0.0.1"
 authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
 
 [dependencies]
-piston_window = "0.15.0"
-ecs = "*"
+sdl2 = "0.30"
+sdl2-engine-helpers = { git = "https://github.com/AngryLawyer/rust-sdl2-engine-helpers.git" }

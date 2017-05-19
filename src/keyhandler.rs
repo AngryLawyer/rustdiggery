@@ -3,7 +3,7 @@ use input::Key;
 
 enum KeyState {
     Press,
-    Release 
+    Release
 }
 
 pub struct KeyHandler {

@@ -24,9 +24,15 @@ impl Process for PrintMessage {
     }
 }
 
+pub struct Renderer();
+
 systems! {
     struct MySystems<MyComponents, ()> {
         print_msg: PrintMessage = PrintMessage("Hello World".to_string())
+        renderer: EntitySystem<Renderer> = EntitySystem::new(
+            Renderer,
+            aspect!(<MyComponents> all: [position, velocity])
+        )
     }
 }
 
