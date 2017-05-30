@@ -39,16 +39,17 @@ fn main() {
         if scene_stack.is_empty() {
             true
         } else {
-            scene_stack.render(&mut canvas, &mut (), frame_number);
-            scene_stack.handle_event(&(), &mut canvas, &mut (), frame_number);
             for event in event_pump.poll_iter() {
                 match event {
                     Event::Quit {..} => {
                         return true
                     },
-                    _ => {}
+                    _ => {
+                        scene_stack.handle_event(&event, &mut canvas, &mut (), frame_number);
+                    }
                 }
             };
+            scene_stack.render(&mut canvas, &mut (), frame_number);
             false
         }
     });
