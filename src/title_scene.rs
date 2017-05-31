@@ -25,6 +25,7 @@ impl Scene<Event, Canvas<Window>, ()> for TitleScene {
     fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
         match *event {
             Event::KeyDown {keycode: Some(Keycode::Escape), ..} => Some(SceneChangeEvent::PopScene),
+            Event::KeyDown {..} => Some(SceneChangeEvent::PushScene(Box::new(|| { TitleScene::new() }))),
             _ => None
         }
     }
