@@ -1,146 +1,10 @@
-use scene::{Scene, BoxedScene, SceneCommand};
-use piston_window::{PistonWindow, UpdateArgs, UpdateEvent, Context, G2d, Transformed};
-use piston_window;
-use std::cell::RefCell;
-use ecs::{World, BuildData, System, Process, DataHelper};
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Position {
-    pub x: u32,
-    pub y: u32,
-}
-
-components! {
-    struct MyComponents {
-        #[hot] position: Position
-    }
-}
-
-pub struct PrintMessage(pub String);
-impl System for PrintMessage { type Components = MyComponents; type Services = (); }
-impl Process for PrintMessage {
-    fn process(&mut self, _: &mut DataHelper<MyComponents, ()>) {
-        println!("{}", &self.0);
-    }
-}
-
-pub struct Renderer();
-
-systems! {
-    struct MySystems<MyComponents, ()> {
-        print_msg: PrintMessage = PrintMessage("Hello World".to_string())
-        renderer: EntitySystem<Renderer> = EntitySystem::new(
-            Renderer,
-            aspect!(<MyComponents> all: [position, velocity])
-        )
-    }
-}
-
-#[derive(Clone)]
-pub enum CellState {
-    Empty,
-    Dirt,
-    Stone,
-    Wall
-}
-
-impl CellState {
-    pub fn is_passable(&self) -> bool {
-        match *self {
-            CellState::Empty | CellState::Dirt => true,
-            _ => false
-        }
-    }
-}
-
-struct Map {
-    cells: Vec<CellState>,
-    world: World<MySystems>,
-    //entities: Vec<RcEntity>,
-    //player: RcEntity,
-    width: u32,
-    height: u32
-}
-
-/*pub struct Adjacents {
-    pub top: Option<(CellState, Option<RcEntity>)>,
-    pub left: Option<(CellState, Option<RcEntity>)>,
-    pub bottom: Option<(CellState, Option<RcEntity>)>,
-    pub right: Option<(CellState, Option<RcEntity>)>
-}*/
-
-impl Map {
-    pub fn new(width: u32, height: u32) -> Map{
-        //let mut entities = vec![];
-        let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        //let player = Entity::new(1,1);
-        //let borrow = player.clone();
-        //entities.push(player);
-        cells[1] = CellState::Empty;
-        cells[width as usize] = CellState::Empty;
-        cells[width as usize + 1] = CellState::Empty;
-        cells[width as usize + 2] = CellState::Empty;
-        cells[(width as usize * 2) + 1] = CellState::Stone;
-        let mut world = World::<MySystems>::new();
-        let entity = world.create_entity(|entity: BuildData<MyComponents>, data: &mut MyComponents| {
-            data.position.add(&entity, Position { x: 0, y: 0 });
-        });
-        println!("{:?}", entity);
-
-        Map {
-            cells: cells,
-            world: world,
-            //entities: entities,
-            width: width,
-            height: height,
-            //player: borrow
-        }
-    }
-
-    /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
-        for entity in self.entities.iter() {
-            entity.borrow().render(context, gl, tick);
-        }
-    }*/
-
-    /*pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
-        let index = x + (y * self.width);
-        return (self.cells[index as usize].clone(), None);
-    }*/
-
-    /*pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
-        let top = if y > 0 {
-            Some(self.at_pos(x, y - 1))
-        } else {
-            None
-        };
-
-        let left = if x > 0 {
-            Some(self.at_pos(x - 1, y))
-        } else {
-            None
-        };
-
-        let bottom = if y < self.height - 1 {
-            Some(self.at_pos(x, y + 1))
-        } else {
-            None
-        };
-
-        let right = if x < self.width - 1 {
-            Some(self.at_pos(x + 1, y))
-        } else {
-            None
-        };
-
-        Adjacents{top: top, left: left, bottom: bottom, right: right}
-    }*/
-
-    pub fn set_pos(&mut self, x: u32, y: u32, state: CellState) {
-        let index = x + (y * self.width);
-        self.cells[index as usize] = state;
-    }
-}
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
+use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
+use map::Map;
 
 pub struct GameScene {
     quit: bool,
@@ -152,7 +16,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new() -> BoxedScene {
+    pub fn new() -> BoxedScene<Event, Canvas<Window>, ()> {
         Box::new(GameScene {
             quit: false,
             map: Map::new(10, 10),
@@ -162,6 +26,20 @@ impl GameScene {
             camera_pos: (0.0, 0.0)
         })
     }
+}
+
+impl Scene<Event, Canvas<Window>, ()> for GameScene {
+
+    fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+        self.map.render(renderer, engine_data, tick);
+    }
+
+    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+        match *event {
+            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => Some(SceneChangeEvent::PopScene),
+            _ => None
+        }
+    }
 
     /*fn adjust_camera_position(&mut self) {
         let (old_x, old_y) = self.camera_pos;
@@ -169,45 +47,7 @@ impl GameScene {
         self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
     }*/
 
-    fn render(&self, context: Context, gl: &mut G2d) {
-        const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-        const BROWN: [f32; 4] = [0.2, 0.2, 0.0, 1.0];
-        const GREY: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
-        const WHITE: [f32; 4] = [1.0; 4];
-        const CELL_SIZE: u32 = 32;
-
-        let (camera_x, camera_y) = self.camera_pos;
-        piston_window::clear(BLACK, gl);
-        let size = context.get_view_size();
-        let width = size[0];
-        let height = size[1];
-
-        let context = context
-            .trans(((width as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64, ((height as u64 / 2) - (CELL_SIZE as u64 / 2)) as f64) //Camera is in the centre of the screen
-            .trans(-camera_x, -camera_y);
-
-        for (i, cell) in self.map.cells.iter().enumerate() {
-            let x = (i as u32 % self.map.width) * CELL_SIZE;
-            let y = (i as u32 / self.map.height) * CELL_SIZE;
-
-            match *cell {
-                CellState::Dirt => {
-                    piston_window::rectangle(BROWN, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                },
-                CellState::Stone => {
-                    piston_window::rectangle(GREY, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                },
-                CellState::Wall => {
-                    piston_window::rectangle(WHITE, piston_window::rectangle::square(x as f64, y as f64, CELL_SIZE as f64), context.transform, gl);
-                }
-                _ => ()
-            }
-        };
-        //self.world.render(context, gl, self.tick);
-
-    }
-
-    fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
+    /*fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
         //self.keyhandler.think(self.tick);
 
@@ -248,38 +88,5 @@ impl GameScene {
             Some(SceneCommand::PopScene)
         } else {
             None
-        }
-    }
-
-    /*fn press(&mut self, button: &Button) {
-        match button {
-            &Button::Keyboard(key) => {
-                self.keyhandler.press(key)
-            },
-            _ => ()
-        };
-        //self.quit = true;
-    }
-
-    fn release(&mut self, button: &Button) {
-        match button {
-            &Button::Keyboard(key) => {
-                self.keyhandler.release(key)
-            },
-            _ => ()
-        };
-    }*/
-}
-
-impl Scene for GameScene {
-    fn handle_event(&mut self, e: &PistonWindow) -> Option<SceneCommand> {
-        if let Some(u) = e.update_args() {
-            self.think(&u)
-        } else {
-            e.draw_2d(|context, g| {
-                self.render(context, g);
-            });
-            None
-        }
-    }
+        }*/
 }
