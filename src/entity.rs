@@ -1,10 +1,11 @@
-use std::collections::HashSet;
-use input::Key;
-use std::rc::Rc;
+use map::{CELL_SIZE, Adjacents};
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 use std::cell::RefCell;
-use opengl_graphics::GlGraphics;
-use graphics;
-use game_scene::Adjacents;
+use std::collections::HashSet;
+use std::rc::Rc;
 
 pub enum Movement {
     NEUTRAL,
@@ -30,7 +31,12 @@ impl Entity {
         }))
     }
 
-    pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
+    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+        renderer.set_draw_color(Color::RGB(255, 0, 0));
+        renderer.fill_rect(Rect::new((self.x * CELL_SIZE) as i32, (self.y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE));
+    }
+
+    /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
         let real_tick = tick / 1000 % 10;
         let fraction = real_tick as f64 / 10.0;
 
@@ -95,7 +101,7 @@ impl Entity {
             },
             _ => ()
         }
-    }
+    }*/
 }
 
 pub type RcEntity = Rc<RefCell<Entity>>;

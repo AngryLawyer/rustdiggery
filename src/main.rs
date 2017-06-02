@@ -5,7 +5,7 @@ extern crate sdl2_engine_helpers;
 //pub mod scene_manager;
 pub mod title_scene;
 pub mod game_scene;
-//pub mod entity;
+pub mod entity;
 //pub mod keyhandler;
 pub mod map;
 
@@ -51,7 +51,8 @@ fn main() {
                     }
                 }
             };
-            scene_stack.render(&mut canvas, &mut (), frame_number);
+            scene_stack.think(&mut canvas, &mut (), frame_number);
+            scene_stack.render(&mut canvas, &(), frame_number);
             false
         }
     });

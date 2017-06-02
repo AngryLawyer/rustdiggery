@@ -6,11 +6,17 @@ use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use game_scene::GameScene;
 
-pub struct TitleScene;
+pub struct TitleScene {
+    quitting: bool,
+    continuing: bool
+}
 
 impl TitleScene {
     pub fn new() -> BoxedScene<Event, Canvas<Window>, ()> {
-        Box::new(TitleScene)
+        Box::new(TitleScene {
+            quitting: false,
+            continuing: false
+        })
     }
 }
 
@@ -23,11 +29,22 @@ impl Scene<Event, Canvas<Window>, ()> for TitleScene {
         renderer.present();
     }
 
-    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
         match *event {
-            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => Some(SceneChangeEvent::PopScene),
-            Event::KeyDown {..} => Some(SceneChangeEvent::PushScene(Box::new(|_, _| { GameScene::new() }))),
-            _ => None
+            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
+            Event::KeyDown {..} => self.continuing = true,
+            _ => ()
+        }
+    }
+
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+        if self.quitting {
+            Some(SceneChangeEvent::PopScene)
+        } else if self.continuing {
+            self.continuing = false;
+            Some(SceneChangeEvent::PushScene(Box::new(|_, _| { GameScene::new() })))
+        } else {
+            None
         }
     }
 }

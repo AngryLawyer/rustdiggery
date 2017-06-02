@@ -7,7 +7,7 @@ use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use map::Map;
 
 pub struct GameScene {
-    quit: bool,
+    quitting: bool,
     map: Map,
     //keyhandler: KeyHandler,
     tick: u64,
@@ -18,7 +18,7 @@ pub struct GameScene {
 impl GameScene {
     pub fn new() -> BoxedScene<Event, Canvas<Window>, ()> {
         Box::new(GameScene {
-            quit: false,
+            quitting: false,
             map: Map::new(10, 10),
             //keyhandler: KeyHandler::new(),
             tick: 0,
@@ -34,10 +34,18 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
         self.map.render(renderer, engine_data, tick);
     }
 
-    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
         match *event {
-            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => Some(SceneChangeEvent::PopScene),
-            _ => None
+            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
+            _ => ()
+        }
+    }
+
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+        if self.quitting {
+            Some(SceneChangeEvent::PopScene)
+        } else {
+            None
         }
     }
 
