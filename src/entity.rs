@@ -6,6 +6,7 @@ use sdl2::video::Window;
 use std::cell::RefCell;
 use std::collections::HashSet;
 use std::rc::Rc;
+use transform::TransformContext;
 
 pub enum Movement {
     NEUTRAL,
@@ -31,9 +32,9 @@ impl Entity {
         }))
     }
 
-    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+    pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
-        renderer.fill_rect(Rect::new((self.x * CELL_SIZE) as i32, (self.y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE));
+        transform.fill_rect(renderer, Rect::new((self.x * CELL_SIZE) as i32, (self.y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE));
     }
 
     /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {

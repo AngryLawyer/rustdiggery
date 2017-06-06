@@ -3,6 +3,7 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2::rect::Rect;
 use entity::{Entity, RcEntity};
+use transform::TransformContext;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -77,18 +78,20 @@ impl Map {
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
 
-        //TODO: Camera offset? Write simple Transforms lib
+        //TODO: Camera offset?
+        let transform = TransformContext::new();
+
         let (width, height) = renderer.logical_size();
 
         for (i, cell) in self.cells.iter().enumerate() {
             let x = (i as u32 % self.width) * CELL_SIZE;
             let y = (i as u32 / self.height) * CELL_SIZE;
             renderer.set_draw_color(cell.get_color());
-            renderer.fill_rect(Rect::new(x as i32, y as i32, CELL_SIZE, CELL_SIZE));
+            transform.fill_rect(renderer, Rect::new(x as i32, y as i32, CELL_SIZE, CELL_SIZE));
         };
 
         for entity in self.entities.iter() {
-            entity.borrow().render(renderer, engine_data, tick);
+            entity.borrow().render(renderer, &transform, engine_data, tick);
         }
 
         renderer.present();
