@@ -38,9 +38,9 @@ impl CellState {
 pub struct Map {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
-    player: RcEntity,
-    width: u32,
-    height: u32
+    pub player: RcEntity,
+    pub width: u32,
+    pub height: u32
 }
 
 pub struct Adjacents {
@@ -74,12 +74,14 @@ impl Map {
         }
     }
 
-    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64, camera_pos: (u32, u32)) {
+        let (camera_x, camera_y) = camera_pos;
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
 
         //TODO: Camera offset?
-        let transform = TransformContext::new();
+        let transform = TransformContext::new()
+            .transform(-(camera_x as i32), -(camera_y as i32));
 
         let (width, height) = renderer.logical_size();
 

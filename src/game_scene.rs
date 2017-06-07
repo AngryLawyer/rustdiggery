@@ -4,7 +4,7 @@ use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
-use map::Map;
+use map::{Map, CELL_SIZE};
 
 pub struct GameScene {
     quitting: bool,
@@ -12,7 +12,7 @@ pub struct GameScene {
     //keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
-    camera_pos: (f64, f64)
+    camera_pos: (u32, u32)
 }
 
 impl GameScene {
@@ -23,15 +23,38 @@ impl GameScene {
             //keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
-            camera_pos: (0.0, 0.0)
+            camera_pos: (0, 0)
         })
     }
+
+    fn adjust_camera_position(&mut self, canvas: &Canvas<Window>) {
+        let (old_x, old_y) = self.camera_pos;
+        let (screen_width, screen_height) = canvas.output_size().expect("Could not get screen size");
+        let min_x = screen_width / 2;
+        let min_y = screen_height / 2;
+
+        let player = self.map.player.borrow();
+
+        let (target_x, target_y) = (player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x as i64, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y as i64);
+        // Constrain if we'd be viewing out of bounds
+        //
+        /*if (target_x < min_x) {
+            target_x = min_x;
+        }
+        if (target_y < min_y) {
+            target_y = min_y;
+        }*/
+
+        self.camera_pos = (target_x as u32, target_y as u32);
+
+    }
+
 }
 
 impl Scene<Event, Canvas<Window>, ()> for GameScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
-        self.map.render(renderer, engine_data, tick);
+        self.map.render(renderer, engine_data, tick, self.camera_pos);
     }
 
     fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
@@ -45,16 +68,10 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {
+            self.adjust_camera_position(renderer);
             None
         }
     }
-
-    /*fn adjust_camera_position(&mut self) {
-        let (old_x, old_y) = self.camera_pos;
-        let player = self.world.player.borrow();
-        self.camera_pos = ((player.x * 32)  as f64, (player.y * 32) as f64);
-    }*/
-
     /*fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
         self.tick += (args.dt * 100000.0) as u64;
         //self.keyhandler.think(self.tick);
