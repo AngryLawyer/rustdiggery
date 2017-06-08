@@ -4,38 +4,45 @@ use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
+use sdl2_engine_helpers::keyhandler::KeyHandler;
 use map::{Map, CELL_SIZE};
 
 pub struct GameScene {
     quitting: bool,
     map: Map,
-    //keyhandler: KeyHandler,
+    keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
     camera_pos: (u32, u32)
 }
 
 impl GameScene {
-    pub fn new() -> BoxedScene<Event, Canvas<Window>, ()> {
-        Box::new(GameScene {
+    pub fn new(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, ()> {
+        let mut scene = Box::new(GameScene {
             quitting: false,
             map: Map::new(10, 10),
-            //keyhandler: KeyHandler::new(),
+            keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
             camera_pos: (0, 0)
-        })
+        });
+        scene.adjust_camera_position(renderer);
+        scene
     }
 
     fn adjust_camera_position(&mut self, canvas: &Canvas<Window>) {
         let (old_x, old_y) = self.camera_pos;
         let (screen_width, screen_height) = canvas.output_size().expect("Could not get screen size");
-        let min_x = screen_width / 2;
-        let min_y = screen_height / 2;
+        let min_x = (screen_width / 2) as i64;
+        let min_y = (screen_height / 2) as i64;
 
         let player = self.map.player.borrow();
 
-        let (target_x, target_y) = (player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x as i64, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y as i64);
+        let (target_x, target_y) = (player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y);
+        let (adjusted_x, adjusted_y) = (
+            if target_x < 0 { 0 } else { target_x },
+            if target_y < 0 { 0 } else { target_y },
+        );
         // Constrain if we'd be viewing out of bounds
         //
         /*if (target_x < min_x) {
@@ -45,7 +52,7 @@ impl GameScene {
             target_y = min_y;
         }*/
 
-        self.camera_pos = (target_x as u32, target_y as u32);
+        self.camera_pos = (adjusted_x as u32, adjusted_y as u32);
 
     }
 
@@ -58,9 +65,9 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
     }
 
     fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
-        match *event {
-            Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
-            _ => ()
+        match event {
+            &Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
+            e => self.keyhandler.handle_event(e)
         }
     }
 
@@ -68,6 +75,24 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {
+            self.keyhandler.think(tick);
+            // Temporary movement
+            if self.keyhandler.is_pressed(Keycode::Left) {
+                let mut player = self.map.player.borrow_mut();
+                player.x = player.x - 1;
+            }
+            if self.keyhandler.is_pressed(Keycode::Right) {
+                let mut player = self.map.player.borrow_mut();
+                player.x = player.x + 1;
+            }
+            if self.keyhandler.is_pressed(Keycode::Up) {
+                let mut player = self.map.player.borrow_mut();
+                player.y = player.y - 1;
+            }
+            if self.keyhandler.is_pressed(Keycode::Down) {
+                let mut player = self.map.player.borrow_mut();
+                player.y = player.y + 1;
+            }
             self.adjust_camera_position(renderer);
             None
         }

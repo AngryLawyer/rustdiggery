@@ -42,7 +42,7 @@ impl Scene<Event, Canvas<Window>, ()> for TitleScene {
             Some(SceneChangeEvent::PopScene)
         } else if self.continuing {
             self.continuing = false;
-            Some(SceneChangeEvent::PushScene(Box::new(|_, _| { GameScene::new() })))
+            Some(SceneChangeEvent::PushScene(Box::new(|renderer, _| { GameScene::new(renderer) })))
         } else {
             None
         }
