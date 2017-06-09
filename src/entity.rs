@@ -19,6 +19,7 @@ pub enum Movement {
 pub struct Entity {
     pub x: u32,
     pub y: u32,
+    pub pos_fraction: f32,
     movement: Movement,
 }
 
@@ -28,6 +29,7 @@ impl Entity {
         Rc::new(RefCell::new(Entity {
             x: x,
             y: y,
+            pos_fraction: 0.0,
             movement: Movement::NEUTRAL,
         }))
     }
@@ -42,7 +44,7 @@ impl Entity {
         let fraction = real_tick as f64 / 10.0;
 
         let predicted_x = (self.x * 32) as f64 + match self.movement {
-            Movement::LEFT => { -32.0 * fraction } ,
+            Movement::LEFT => { -32.0 * fraction },
             Movement::RIGHT => { 32.0 * fraction },
             _ => 0.0
         };
@@ -64,11 +66,11 @@ impl Entity {
             _ => {}
         };
         self.movement = Movement::NEUTRAL;
-    }
+    }*/
 
-    pub fn input(&mut self, key: Key, adjacents: &Adjacents) {
+    pub fn input(&mut self, key: Movement, adjacents: &Adjacents) {
         match key {
-            Key::Up => {
+            Movement::UP => {
                 match adjacents.top {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::UP;
@@ -76,7 +78,7 @@ impl Entity {
                     _ => ()
                 }
             },
-            Key::Down => {
+            Movement::DOWN => {
                 match adjacents.bottom {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::DOWN;
@@ -84,7 +86,7 @@ impl Entity {
                     _ => ()
                 }
             },
-            Key::Left => {
+            Movement::LEFT => {
                 match adjacents.left {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::LEFT;
@@ -92,7 +94,7 @@ impl Entity {
                     _ => ()
                 }
             },
-            Key::Right => {
+            Movement::RIGHT => {
                 match adjacents.right {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::RIGHT;
@@ -102,7 +104,7 @@ impl Entity {
             },
             _ => ()
         }
-    }*/
+    }
 }
 
 pub type RcEntity = Rc<RefCell<Entity>>;

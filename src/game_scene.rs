@@ -5,7 +5,13 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use sdl2_engine_helpers::keyhandler::KeyHandler;
+use sdl2_engine_helpers::event_bus::EventBus;
 use map::{Map, CELL_SIZE};
+use entity::Movement;
+
+pub enum GameEvent {
+    MoveEvent(Movement)
+}
 
 pub struct GameScene {
     quitting: bool,
@@ -13,7 +19,7 @@ pub struct GameScene {
     keyhandler: KeyHandler,
     tick: u64,
     next_think: u64,
-    camera_pos: (u32, u32)
+    camera_pos: (u32, u32),
 }
 
 impl GameScene {
@@ -24,7 +30,7 @@ impl GameScene {
             keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,
-            camera_pos: (0, 0)
+            camera_pos: (0, 0),
         });
         scene.adjust_camera_position(renderer);
         scene
@@ -75,24 +81,23 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {
+            let mut event_bus = EventBus::new();
             self.keyhandler.think(tick);
             // Temporary movement
             if self.keyhandler.is_pressed(Keycode::Left) {
-                let mut player = self.map.player.borrow_mut();
-                player.x = player.x - 1;
+                event_bus.enqueue(GameEvent::MoveEvent(Movement::LEFT));
             }
             if self.keyhandler.is_pressed(Keycode::Right) {
-                let mut player = self.map.player.borrow_mut();
-                player.x = player.x + 1;
+                event_bus.enqueue(GameEvent::MoveEvent(Movement::RIGHT));
             }
             if self.keyhandler.is_pressed(Keycode::Up) {
-                let mut player = self.map.player.borrow_mut();
-                player.y = player.y - 1;
+                event_bus.enqueue(GameEvent::MoveEvent(Movement::UP));
             }
             if self.keyhandler.is_pressed(Keycode::Down) {
-                let mut player = self.map.player.borrow_mut();
-                player.y = player.y + 1;
+                event_bus.enqueue(GameEvent::MoveEvent(Movement::DOWN));
             }
+
+            self.map.think(&mut event_bus, renderer, engine_data, tick);
             self.adjust_camera_position(renderer);
             None
         }

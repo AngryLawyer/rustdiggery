@@ -4,6 +4,8 @@ use sdl2::video::Window;
 use sdl2::rect::Rect;
 use entity::{Entity, RcEntity};
 use transform::TransformContext;
+use game_scene::GameEvent;
+use sdl2_engine_helpers::event_bus::EventBus;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -97,20 +99,35 @@ impl Map {
         }
 
         renderer.present();
-
     }
+
+    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+        // TODO: Check for collisions
+        // Handle dealing with queued events
+        while let Some(event) = event_bus.next() {
+            match event {
+                GameEvent::MoveEvent(direction) => {
+                    let mut player = self.player.borrow_mut();
+                    let adjacents = self.adjacents(player.x, player.y);
+                    player.input(direction, &adjacents);
+                },
+                _ => ()
+            }
+        }
+    }
+
     /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
         for entity in self.entities.iter() {
             entity.borrow().render(context, gl, tick);
         }
     }*/
 
-    /*pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
+    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
         let index = x + (y * self.width);
         return (self.cells[index as usize].clone(), None);
-    }*/
+    }
 
-    /*pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
+    pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
         let top = if y > 0 {
             Some(self.at_pos(x, y - 1))
         } else {
@@ -136,7 +153,7 @@ impl Map {
         };
 
         Adjacents{top: top, left: left, bottom: bottom, right: right}
-    }*/
+    }
 
     pub fn set_cell_state(&mut self, x: u32, y: u32, state: CellState) {
         let index = x + (y * self.width);
