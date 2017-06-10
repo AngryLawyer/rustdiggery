@@ -10,7 +10,8 @@ use map::{Map, CELL_SIZE};
 use entity::Movement;
 
 pub enum GameEvent {
-    MoveEvent(Movement)
+    MoveEvent(Movement),
+    DigEvent(u32, u32)
 }
 
 pub struct GameScene {
@@ -26,7 +27,7 @@ impl GameScene {
     pub fn new(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, ()> {
         let mut scene = Box::new(GameScene {
             quitting: false,
-            map: Map::new(10, 10),
+            map: Map::new(50, 50),
             keyhandler: KeyHandler::new(),
             tick: 0,
             next_think: 0,

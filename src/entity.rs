@@ -7,6 +7,9 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::rc::Rc;
 use transform::TransformContext;
+use map::CellState;
+use sdl2_engine_helpers::event_bus::EventBus;
+use game_scene::GameEvent;
 
 pub enum Movement {
     NEUTRAL,
@@ -88,6 +91,15 @@ impl Entity {
                 Movement::DOWN => { self.pos_fraction_y += 0.1},
                 _ => {}
             };
+        }
+    }
+
+    pub fn collisions(&self, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>)) {
+        match cell_state {
+            (CellState::Dirt, _) => {
+                event_bus.enqueue(GameEvent::DigEvent(self.x, self.y));
+            },
+            _ => ()
         }
     }
 

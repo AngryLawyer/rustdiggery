@@ -103,6 +103,10 @@ impl Map {
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
         // TODO: Check for collisions
+        {
+            let player = self.player.borrow();
+            player.collisions(event_bus, self.at_pos(player.x, player.y));
+        }
         // Handle dealing with queued events
         while let Some(event) = event_bus.next() {
             match event {
@@ -110,6 +114,9 @@ impl Map {
                     let mut player = self.player.borrow_mut();
                     let adjacents = self.adjacents(player.x, player.y);
                     player.input(direction, &adjacents);
+                },
+                GameEvent::DigEvent(x, y) => {
+                    self.set_cell_state(x, y, CellState::Empty);
                 },
                 _ => ()
             }
