@@ -114,6 +114,9 @@ impl Map {
                 _ => ()
             }
         }
+        // Do actual movement
+        let mut player = self.player.borrow_mut();
+        player.think(tick);
     }
 
     /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {

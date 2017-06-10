@@ -19,7 +19,8 @@ pub enum Movement {
 pub struct Entity {
     pub x: u32,
     pub y: u32,
-    pub pos_fraction: f32,
+    pub pos_fraction_x: f32,
+    pub pos_fraction_y: f32,
     movement: Movement,
 }
 
@@ -29,14 +30,23 @@ impl Entity {
         Rc::new(RefCell::new(Entity {
             x: x,
             y: y,
-            pos_fraction: 0.0,
+            pos_fraction_x: 0.0,
+            pos_fraction_y: 0.0,
             movement: Movement::NEUTRAL,
         }))
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
-        transform.fill_rect(renderer, Rect::new((self.x * CELL_SIZE) as i32, (self.y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE));
+        transform.fill_rect(
+            renderer,
+            Rect::new(
+                ((self.x * CELL_SIZE) as i32 + (CELL_SIZE as f32 * self.pos_fraction_x) as i32) as i32,
+                ((self.y * CELL_SIZE) as i32 + (CELL_SIZE as f32 * self.pos_fraction_y) as i32) as i32,
+                CELL_SIZE,
+                CELL_SIZE
+            )
+        );
     }
 
     /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
@@ -55,20 +65,37 @@ impl Entity {
         };
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         graphics::rectangle(RED, graphics::rectangle::square(predicted_x, predicted_y, 32.0), context.transform, gl);
-    }
-
-    pub fn think(&mut self, tick: u64, adjacents: &Adjacents) {
-        match self.movement {
-            Movement::LEFT => { self.x -= 1},
-            Movement::RIGHT => { self.x += 1},
-            Movement::UP => { self.y -= 1},
-            Movement::DOWN => { self.y += 1},
-            _ => {}
-        };
-        self.movement = Movement::NEUTRAL;
     }*/
 
+    pub fn think(&mut self, tick: u64) {
+        if self.pos_fraction_x >= 0.9 || self.pos_fraction_x <= -0.9  ||
+            self.pos_fraction_y >= 0.9 || self.pos_fraction_y <= -0.9 {
+            match self.movement {
+                Movement::LEFT => { self.x -= 1},
+                Movement::RIGHT => { self.x += 1},
+                Movement::UP => { self.y -= 1},
+                Movement::DOWN => { self.y += 1},
+                _ => {}
+            };
+            self.pos_fraction_x = 0.0;
+            self.pos_fraction_y = 0.0;
+            self.movement = Movement::NEUTRAL;
+        } else {
+            match self.movement {
+                Movement::LEFT => { self.pos_fraction_x -= 0.1},
+                Movement::RIGHT => { self.pos_fraction_x += 0.1},
+                Movement::UP => { self.pos_fraction_y -= 0.1},
+                Movement::DOWN => { self.pos_fraction_y += 0.1},
+                _ => {}
+            };
+        }
+    }
+
     pub fn input(&mut self, key: Movement, adjacents: &Adjacents) {
+        if self.pos_fraction_x != 0.0 || self.pos_fraction_y != 0.0 {
+            return;
+        }
+
         match key {
             Movement::UP => {
                 match adjacents.top {
