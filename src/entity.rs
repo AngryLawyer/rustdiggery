@@ -19,11 +19,18 @@ pub enum Movement {
     DOWN
 }
 
+pub enum CellMoveState {
+    NEUTRAL,
+    ENTERING,
+    EXITING
+}
+
 pub struct Entity {
     pub x: u32,
     pub y: u32,
     pub pos_fraction: f32,
     movement: Movement,
+    cell_move_state: CellMoveState,
 }
 
 impl Entity {
@@ -34,64 +41,54 @@ impl Entity {
             y: y,
             pos_fraction: 0.0,
             movement: Movement::NEUTRAL,
+            cell_move_state: CellMoveState::NEUTRAL,
         }))
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
-        let (x_offset, y_offset) = match self.movement {
-            Movement::NEUTRAL => (0.0, 0.0),
-            Movement::LEFT => (-self.pos_fraction, 0.0),
-            Movement::RIGHT => (self.pos_fraction, 0.0),
-            Movement::UP => (0.0, -self.pos_fraction),
-            Movement::DOWN => (0.0, self.pos_fraction),
-        };
+        let (x, y) = self.get_abs_position();
         transform.fill_rect(
             renderer,
             Rect::new(
-                ((self.x * CELL_SIZE) as i32 + (CELL_SIZE as f32 * x_offset) as i32) as i32,
-                ((self.y * CELL_SIZE) as i32 + (CELL_SIZE as f32 * y_offset) as i32) as i32,
+                x,
+                y,
                 CELL_SIZE,
                 CELL_SIZE
             )
         );
     }
 
-    /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
-        let real_tick = tick / 1000 % 10;
-        let fraction = real_tick as f64 / 10.0;
-
-        let predicted_x = (self.x * 32) as f64 + match self.movement {
-            Movement::LEFT => { -32.0 * fraction },
-            Movement::RIGHT => { 32.0 * fraction },
-            _ => 0.0
-        };
-        let predicted_y = (self.y * 32) as f64 + match self.movement {
-            Movement::UP => { -32.0 * fraction } ,
-            Movement::DOWN => { 32.0 * fraction },
-            _ => 0.0
-        };
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-        graphics::rectangle(RED, graphics::rectangle::square(predicted_x, predicted_y, 32.0), context.transform, gl);
-    }*/
-
     pub fn think(&mut self, tick: u64) {
-        if self.pos_fraction >= 0.9 {
-            match self.movement {
-                Movement::LEFT => { self.x -= 1},
-                Movement::RIGHT => { self.x += 1},
-                Movement::UP => { self.y -= 1},
-                Movement::DOWN => { self.y += 1},
-                _ => {}
-            };
-            self.pos_fraction = 0.0;
-            self.movement = Movement::NEUTRAL;
-        } else {
-            match self.movement {
-                Movement::NEUTRAL => (),
-                _ => { self.pos_fraction += 0.1},
-            };
+        // TODO: This should be an event
+        match self.cell_move_state {
+            CellMoveState::NEUTRAL => (),
+            CellMoveState::EXITING => {
+                if self.pos_fraction >= 0.5 {
+                    match self.movement {
+                        Movement::LEFT => { self.x -= 1},
+                        Movement::RIGHT => { self.x += 1},
+                        Movement::UP => { self.y -= 1},
+                        Movement::DOWN => { self.y += 1},
+                        _ => {}
+                    };
+                    self.pos_fraction = -0.4;
+                    self.cell_move_state = CellMoveState::ENTERING;
+                } else {
+                    self.pos_fraction += 0.1;
+                }
+            },
+            CellMoveState::ENTERING => {
+                if self.pos_fraction >= 0.0 {
+                    self.pos_fraction = 0.0;
+                    self.cell_move_state = CellMoveState::NEUTRAL;
+                    self.movement = Movement::NEUTRAL;
+                } else {
+                    self.pos_fraction += 0.1;
+                }
+            }
         }
+
     }
 
     pub fn collisions(&self, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>)) {
@@ -113,6 +110,7 @@ impl Entity {
                 match adjacents.top {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::UP;
+                        self.cell_move_state = CellMoveState::EXITING;
                     },
                     _ => ()
                 }
@@ -121,6 +119,7 @@ impl Entity {
                 match adjacents.bottom {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::DOWN;
+                        self.cell_move_state = CellMoveState::EXITING;
                     },
                     _ => ()
                 }
@@ -129,6 +128,7 @@ impl Entity {
                 match adjacents.left {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::LEFT;
+                        self.cell_move_state = CellMoveState::EXITING;
                     },
                     _ => ()
                 }
@@ -137,12 +137,27 @@ impl Entity {
                 match adjacents.right {
                     Some((ref tile, _)) if tile.is_passable() => {
                         self.movement = Movement::RIGHT;
+                        self.cell_move_state = CellMoveState::EXITING;
                     },
                     _ => ()
                 }
             },
             _ => ()
         }
+    }
+
+    pub fn get_abs_position(&self) -> (i32, i32) {
+        let (x_offset, y_offset) = match self.movement {
+            Movement::NEUTRAL => (0.0, 0.0),
+            Movement::LEFT => (-self.pos_fraction, 0.0),
+            Movement::RIGHT => (self.pos_fraction, 0.0),
+            Movement::UP => (0.0, -self.pos_fraction),
+            Movement::DOWN => (0.0, self.pos_fraction),
+        };
+        (
+            ((self.x * CELL_SIZE) as i32 + (CELL_SIZE as f32 * x_offset) as i32) as i32,
+            ((self.y * CELL_SIZE) as i32 + (CELL_SIZE as f32 * y_offset) as i32) as i32,
+        )
     }
 }
 

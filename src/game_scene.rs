@@ -45,7 +45,9 @@ impl GameScene {
 
         let player = self.map.player.borrow();
 
-        let (target_x, target_y) = (player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y);
+        let (target_x, target_y) = player.get_abs_position();
+        let (target_x, target_y) = (target_x as i64 + (CELL_SIZE as i64 / 2) - min_x, target_y as i64 + (CELL_SIZE as i64 / 2) - min_y);
+        //(player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y);
         let (adjusted_x, adjusted_y) = (
             if target_x < 0 { 0 } else { target_x },
             if target_y < 0 { 0 } else { target_y },

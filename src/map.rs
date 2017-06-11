@@ -81,7 +81,6 @@ impl Map {
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
 
-        //TODO: Camera offset?
         let transform = TransformContext::new()
             .transform(-(camera_x as i32), -(camera_y as i32));
 
