@@ -6,6 +6,7 @@ use entity::{Entity, RcEntity};
 use transform::TransformContext;
 use game_scene::GameEvent;
 use sdl2_engine_helpers::event_bus::EventBus;
+use player::Player;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -58,7 +59,7 @@ impl Map {
     pub fn new(width: u32, height: u32) -> Map{
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        let player = Entity::new(1,1);
+        let player = Entity::new(1,1, Player::new());
         let borrow = player.clone();
         entities.push(player);
         cells[1] = CellState::Empty;
@@ -104,17 +105,17 @@ impl Map {
         // TODO: Check for collisions
         {
             let player = self.player.borrow();
-            player.collisions(event_bus, self.at_pos(player.x, player.y));
+            player.collisions(event_bus, self.at_pos(player.state.x, player.state.y));
         }
         // Handle dealing with queued events
         while let Some(event) = event_bus.next() {
             match event {
-                GameEvent::MoveEvent(direction) => {
+                GameEvent::MoveRequest(direction) => {
                     let mut player = self.player.borrow_mut();
-                    let adjacents = self.adjacents(player.x, player.y);
+                    let adjacents = self.adjacents(player.state.x, player.state.y);
                     player.input(direction, &adjacents);
                 },
-                GameEvent::DigEvent(x, y) => {
+                GameEvent::Dig(x, y) => {
                     self.set_cell_state(x, y, CellState::Empty);
                 },
                 _ => ()

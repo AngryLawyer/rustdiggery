@@ -10,8 +10,8 @@ use map::{Map, CELL_SIZE};
 use entity::Movement;
 
 pub enum GameEvent {
-    MoveEvent(Movement),
-    DigEvent(u32, u32)
+    MoveRequest(Movement),
+    Dig(u32, u32)
 }
 
 pub struct GameScene {
@@ -88,16 +88,16 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
             self.keyhandler.think(tick);
             // Temporary movement
             if self.keyhandler.is_pressed(Keycode::Left) {
-                event_bus.enqueue(GameEvent::MoveEvent(Movement::LEFT));
+                event_bus.enqueue(GameEvent::MoveRequest(Movement::LEFT));
             }
             if self.keyhandler.is_pressed(Keycode::Right) {
-                event_bus.enqueue(GameEvent::MoveEvent(Movement::RIGHT));
+                event_bus.enqueue(GameEvent::MoveRequest(Movement::RIGHT));
             }
             if self.keyhandler.is_pressed(Keycode::Up) {
-                event_bus.enqueue(GameEvent::MoveEvent(Movement::UP));
+                event_bus.enqueue(GameEvent::MoveRequest(Movement::UP));
             }
             if self.keyhandler.is_pressed(Keycode::Down) {
-                event_bus.enqueue(GameEvent::MoveEvent(Movement::DOWN));
+                event_bus.enqueue(GameEvent::MoveRequest(Movement::DOWN));
             }
 
             self.map.think(&mut event_bus, renderer, engine_data, tick);

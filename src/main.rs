@@ -1,14 +1,12 @@
 extern crate sdl2;
 extern crate sdl2_engine_helpers;
 
-//pub mod scene;
-//pub mod scene_manager;
 pub mod title_scene;
 pub mod game_scene;
 pub mod entity;
-//pub mod keyhandler;
 pub mod map;
 pub mod transform;
+pub mod player;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
