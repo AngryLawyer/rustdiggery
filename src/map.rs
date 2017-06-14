@@ -152,7 +152,40 @@ impl Map {
                 },
                 GameEvent::Crushed(item) => {
                     // TODO: Explosions!
+                    let (x, y) = {
+                        let item = item.borrow();
+                        (item.state.x, item.state.y)
+                    };
                     item.borrow_mut().destroy();
+                    event_bus.enqueue(GameEvent::Explosion(x, y));
+                },
+                GameEvent::Explosion(x, y) => {
+                    let (x, y) = (x as i64, y as i64);
+                    let (width, height) = (self.width as i64, self.height as i64);
+                    for &(x, y) in vec![
+                        (x - 1, y - 1),
+                        (x, y - 1),
+                        (x + 1, y - 1),
+                        (x - 1, y),
+                        (x,  y),
+                        (x + 1, y),
+                        (x - 1, y + 1),
+                        (x, y + 1),
+                        (x + 1, y + 1),
+                    ].iter().filter(|pair| {
+                        let &(x, y) = *pair;
+                        x >= 0 && y >= 0 && x < width && y < height
+                    }) {
+                        let (x, y) = (x as u32, y as u32);
+                        let (state, items) = self.at_pos(x, y);
+                        match state {
+                            CellState::Wall => {},
+                            _ => self.set_cell_state(x, y, CellState::Empty)
+                        };
+                        for item in items {
+                            item.borrow_mut().destroy();
+                        }
+                    }
                 },
                 _ => ()
             }

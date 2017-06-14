@@ -12,7 +12,8 @@ use entity::{Movement, RcEntity};
 pub enum GameEvent {
     MoveRequest(Movement),
     Dig(u32, u32),
-    Crushed(RcEntity)
+    Crushed(RcEntity),
+    Explosion(u32, u32)
 }
 
 pub struct GameScene {
