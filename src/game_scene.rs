@@ -105,46 +105,4 @@ impl Scene<Event, Canvas<Window>, ()> for GameScene {
             None
         }
     }
-    /*fn think(&mut self, args: &UpdateArgs) -> Option<SceneCommand> {
-        self.tick += (args.dt * 100000.0) as u64;
-        //self.keyhandler.think(self.tick);
-
-        if self.tick >= self.next_think {
-            self.next_think += 10000;
-            {
-                self.map.world.update();
-                //FIXME: Make this use weak references once we have them
-                /*let entity = self.world.player.clone();
-                let mut entity = entity.borrow_mut();
-                //Move existing
-                let x = entity.x;
-                let y = entity.y;
-                entity.think(self.tick, &self.world.adjacents(x, y));
-
-                let x = entity.x;
-                let y = entity.y;
-                self.world.set_pos(x, y, CellState::Empty);
-
-                //Handle player input
-                match self.keyhandler.last_key() {
-                    Some((key, tick)) => {
-                        let difference = self.tick - tick;
-                        if difference < 8000 || difference > 20000 {
-                            let x = entity.x;
-                            let y = entity.y;
-                            entity.input(key, &self.world.adjacents(x, y));
-                        }
-                    },
-                    None => ()
-                }*/
-            }
-
-            //self.adjust_camera_position();
-        }
-
-        if self.quit {
-            Some(SceneCommand::PopScene)
-        } else {
-            None
-        }*/
 }

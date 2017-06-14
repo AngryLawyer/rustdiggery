@@ -141,12 +141,6 @@ impl Map {
         }
     }
 
-    /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {
-        for entity in self.entities.iter() {
-            entity.borrow().render(context, gl, tick);
-        }
-    }*/
-
     pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
         let index = x + (y * self.width);
         return (self.cells[index as usize].clone(), None);
