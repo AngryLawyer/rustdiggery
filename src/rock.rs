@@ -27,10 +27,32 @@ impl EntityType for Rock {
             return;
         }
 
-        match (&adjacents.left, &adjacents.top, &adjacents.right, &adjacents.bottom) {
-            (_, _, _, &Some((CellState::Empty, None))) => {
+        match (
+            &adjacents.left,
+            &adjacents.right,
+            &adjacents.bottom_left,
+            &adjacents.bottom,
+            &adjacents.bottom_right
+        ) {
+            (_, _, _, &Some((CellState::Empty, None)), _) => {
                 state.movement = Movement::DOWN;
                 state.cell_move_state = CellMoveState::EXITING;
+            },
+            (_, &Some((CellState::Empty, None)), _, &Some((CellState::Empty, Some(ref underneath))), &Some((CellState::Empty, None))) => {
+                if underneath.borrow().is_hard() {
+                    state.movement = Movement::RIGHT;
+                    state.cell_move_state = CellMoveState::EXITING;
+                } else {
+                    state.movement = Movement::NEUTRAL;
+                }
+            },
+            (&Some((CellState::Empty, None)), _, &Some((CellState::Empty, None)), &Some((CellState::Empty, Some(ref underneath))), _) => {
+                if underneath.borrow().is_hard() {
+                    state.movement = Movement::LEFT;
+                    state.cell_move_state = CellMoveState::EXITING;
+                } else {
+                    state.movement = Movement::NEUTRAL;
+                }
             },
             _ => {
                 state.movement = Movement::NEUTRAL;

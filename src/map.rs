@@ -90,6 +90,10 @@ impl Map {
         map.set_cell_state(5, 3, CellState::Empty);
         let rock = Entity::new(5, 0, Rock::new());
         map.entities.push(rock);
+        let rock = Entity::new(5, 1, Rock::new());
+        map.entities.push(rock);
+        let rock = Entity::new(5, 2, Rock::new());
+        map.entities.push(rock);
 
         map
     }
