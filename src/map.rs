@@ -92,6 +92,9 @@ impl Map {
         map.set_cell_state(5, 1, CellState::Empty);
         map.set_cell_state(5, 2, CellState::Empty);
         map.set_cell_state(5, 3, CellState::Empty);
+        map.set_cell_state(6, 1, CellState::Empty);
+        map.set_cell_state(6, 2, CellState::Empty);
+        map.set_cell_state(6, 3, CellState::Empty);
         let rock = Entity::new(5, 0, Rock::new(), &mut ids);
         map.entities.push(rock);
         let rock = Entity::new(5, 1, Rock::new(), &mut ids);
