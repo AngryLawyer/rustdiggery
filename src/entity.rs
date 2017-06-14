@@ -33,6 +33,7 @@ pub enum CellMoveState {
 }
 
 pub struct EntityState {
+    pub id: u32,
     pub x: u32,
     pub y: u32,
     pub pos_fraction: f32,
@@ -47,17 +48,20 @@ pub struct Entity {
 
 impl Entity {
 
-    pub fn new(x: u32, y: u32, entity_type: Box<EntityType>) -> RcEntity {
-        Rc::new(RefCell::new(Entity {
+    pub fn new(x: u32, y: u32, entity_type: Box<EntityType>, id: &mut u32) -> RcEntity {
+        let item = Rc::new(RefCell::new(Entity {
             state: EntityState {
                 x: x,
                 y: y,
                 pos_fraction: 0.0,
                 movement: Movement::NEUTRAL,
                 cell_move_state: CellMoveState::NEUTRAL,
+                id: *id
             },
             entity_type: entity_type
-        }))
+        }));
+        *id += 1;
+        item
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
@@ -134,6 +138,31 @@ impl Entity {
 
     pub fn is_hard(&self) -> bool {
         self.entity_type.is_hard()
+    }
+
+    pub fn target_square(&self) -> Option<(u32, u32)> {
+        match self.state.cell_move_state {
+            CellMoveState::EXITING => {
+                Some(match self.state.movement {
+                    Movement::NEUTRAL => (self.state.x, self.state.y),
+                    Movement::LEFT => (self.state.x - 1, self.state.y),
+                    Movement::RIGHT => (self.state.x + 1, self.state.y),
+                    Movement::UP => (self.state.x, self.state.y - 1),
+                    Movement::DOWN => (self.state.x, self.state.y + 1),
+                })
+            },
+            _ => None
+        }
+    }
+
+    pub fn deflect(&mut self) {
+        match self.state.cell_move_state {
+            CellMoveState::EXITING => {
+                self.state.cell_move_state = CellMoveState::ENTERING;
+                self.state.pos_fraction = 1.0 - self.state.pos_fraction;
+            },
+            _ => ()
+        }
     }
 }
 

@@ -9,6 +9,7 @@ use sdl2_engine_helpers::event_bus::EventBus;
 use player::Player;
 use rock::Rock;
 use std::collections::HashMap;
+use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -44,6 +45,7 @@ pub struct Map {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
     locations: HashMap<(u32, u32), RcEntity>,
+    conflicts: HashMap<(u32, u32), Vec<RcEntity>>,
     pub player: RcEntity,
     pub width: u32,
     pub height: u32
@@ -64,9 +66,10 @@ pub const CELL_SIZE: u32 = 32;
 
 impl Map {
     pub fn new(width: u32, height: u32) -> Map{
+        let mut ids = 0;
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        let player = Entity::new(1,1, Player::new());
+        let player = Entity::new(1,1, Player::new(), &mut ids);
         let borrow = player.clone();
         entities.push(player);
         cells[1] = CellState::Empty;
@@ -81,18 +84,19 @@ impl Map {
             width: width,
             height: height,
             player: borrow,
-            locations: HashMap::new()
+            locations: HashMap::new(),
+            conflicts: HashMap::new()
         };
 
         map.set_cell_state(5, 0, CellState::Empty);
         map.set_cell_state(5, 1, CellState::Empty);
         map.set_cell_state(5, 2, CellState::Empty);
         map.set_cell_state(5, 3, CellState::Empty);
-        let rock = Entity::new(5, 0, Rock::new());
+        let rock = Entity::new(5, 0, Rock::new(), &mut ids);
         map.entities.push(rock);
-        let rock = Entity::new(5, 1, Rock::new());
+        let rock = Entity::new(5, 1, Rock::new(), &mut ids);
         map.entities.push(rock);
-        let rock = Entity::new(5, 2, Rock::new());
+        let rock = Entity::new(5, 2, Rock::new(), &mut ids);
         map.entities.push(rock);
 
         map
@@ -149,6 +153,8 @@ impl Map {
                 _ => ()
             }
         }
+        // Handle conflicts
+        self.handle_conflicts();
         // Do actual movement
         for entity in &self.entities {
             entity.borrow_mut().process(tick);
@@ -239,6 +245,60 @@ impl Map {
                 (entity.state.x, entity.state.y)
             };
             self.locations.insert((x, y), entity.clone());
+        }
+    }
+
+    pub fn handle_conflicts(&mut self) {
+        /*
+         * Check if multiple items are trying to enter a square.
+         * If they're hard, only one should move
+         */
+        self.conflicts.clear();
+        for entity in &self.entities {
+            match entity.borrow().target_square() {
+                Some((x, y)) => {
+                    let new_list = match self.conflicts.remove(&(x, y)) {
+                        Some(mut list) => {
+                            list.push(entity.clone());
+                            list
+                        },
+                        None => vec![entity.clone()]
+                    };
+                    self.conflicts.insert((x, y), new_list);
+                },
+                None => ()
+            }
+            let (x, y) = {
+                let entity = entity.borrow();
+                (entity.state.x, entity.state.y)
+            };
+            self.locations.insert((x, y), entity.clone());
+        }
+
+        for list in self.conflicts.values() {
+            if list.len() > 1 {
+                let priority = list.iter().filter(|item| item.borrow().is_hard()).max_by(|left, right| {
+                    if (right.borrow().state.pos_fraction > left.borrow().state.pos_fraction) {
+                        Ordering::Less
+                    } else {
+                        Ordering::Greater
+                    }
+                });
+                match priority {
+                    Some(item) => {
+                        let item = item.borrow();
+                        for other in list {
+                            match other.try_borrow_mut() {
+                                Ok(mut item) => {
+                                    item.deflect()
+                                },
+                                _ => ()
+                            }
+                        }
+                    },
+                    None => ()
+                }
+            }
         }
     }
 }
