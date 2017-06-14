@@ -143,7 +143,28 @@ impl Map {
 
     pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
         let index = x + (y * self.width);
-        return (self.cells[index as usize].clone(), None);
+        let mut item = None;
+        for entity in &self.entities {
+            let entity = entity.clone();
+            {
+                let borrowed = entity.try_borrow();
+                let matched = match borrowed {
+                    Ok(borrowed) => {
+                        if borrowed.state.x == x && borrowed.state.y == y {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    _ => false
+                };
+                if matched {
+                    item = Some(entity.clone());
+                    break;
+                }
+            }
+        }
+        return (self.cells[index as usize].clone(), item);
     }
 
     pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {

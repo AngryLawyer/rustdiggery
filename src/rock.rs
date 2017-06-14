@@ -28,7 +28,7 @@ impl EntityType for Rock {
         }
 
         match adjacents.bottom {
-            Some((CellState::Empty, _)) => {
+            Some((CellState::Empty, None)) => {
                 state.movement = Movement::DOWN;
                 state.cell_move_state = CellMoveState::EXITING;
             },

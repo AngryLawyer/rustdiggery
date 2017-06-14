@@ -21,7 +21,7 @@ impl EntityType for Player {
         match key {
             Movement::UP => {
                 match adjacents.top {
-                    Some((ref tile, _)) if tile.is_passable() => {
+                    Some((ref tile, None)) if tile.is_passable() => {
                         state.movement = Movement::UP;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -30,7 +30,7 @@ impl EntityType for Player {
             },
             Movement::DOWN => {
                 match adjacents.bottom {
-                    Some((ref tile, _)) if tile.is_passable() => {
+                    Some((ref tile, None)) if tile.is_passable() => {
                         state.movement = Movement::DOWN;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -39,7 +39,7 @@ impl EntityType for Player {
             },
             Movement::LEFT => {
                 match adjacents.left {
-                    Some((ref tile, _)) if tile.is_passable() => {
+                    Some((ref tile, None)) if tile.is_passable() => {
                         state.movement = Movement::LEFT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -48,7 +48,7 @@ impl EntityType for Player {
             },
             Movement::RIGHT => {
                 match adjacents.right {
-                    Some((ref tile, _)) if tile.is_passable() => {
+                    Some((ref tile, None)) if tile.is_passable() => {
                         state.movement = Movement::RIGHT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
