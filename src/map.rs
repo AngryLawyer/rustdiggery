@@ -150,9 +150,15 @@ impl Map {
                 GameEvent::Dig(x, y) => {
                     self.set_cell_state(x, y, CellState::Empty);
                 },
+                GameEvent::Crushed(item) => {
+                    // TODO: Explosions!
+                    item.borrow_mut().destroy();
+                },
                 _ => ()
             }
         }
+        // Cleanup items
+        self.cleanup();
         // Handle conflicts
         self.handle_conflicts();
         // Do actual movement
@@ -299,5 +305,15 @@ impl Map {
             }
         }
     }
-}
 
+
+    pub fn cleanup(&mut self) {
+        self.entities = self.entities.iter().filter_map(|entity| {
+            if entity.borrow().state.destroyed {
+                None
+            } else {
+                Some(entity.clone())
+            }
+        }).collect::<Vec<RcEntity>>()
+    }
+}

@@ -4,11 +4,15 @@ use game_scene::GameEvent;
 use map::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 
-pub struct Rock;
+pub struct Rock {
+    momentum: bool,
+}
 
 impl Rock {
     pub fn new() -> Box<EntityType> {
-        Box::new(Rock)
+        Box::new(Rock {
+            momentum: false
+        })
     }
 }
 
@@ -18,6 +22,13 @@ impl EntityType for Rock {
 
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
         match cell_state {
+            (_, ref items) if items.len() > 0 => {
+                for item in items {
+                    if !item.borrow().is_hard() {
+                        event_bus.enqueue(GameEvent::Crushed(item.clone()));
+                    }
+                }
+            },
             _ => ()
         }
     }
@@ -37,25 +48,41 @@ impl EntityType for Rock {
             (_, _, _, &Some((CellState::Empty, ref items)), _) if items.len() == 0 => {
                 state.movement = Movement::DOWN;
                 state.cell_move_state = CellMoveState::EXITING;
+                self.momentum = true;
+            },
+            (_, _, _, &Some((CellState::Empty, ref items)), _) if items.len() > 0 && self.momentum => {
+                if !items.first().unwrap().borrow().is_hard() {
+                    state.movement = Movement::DOWN;
+                    state.cell_move_state = CellMoveState::EXITING;
+                    self.momentum = true;
+                } else {
+                    state.movement = Movement::NEUTRAL;
+                    self.momentum = false;
+                }
             },
             (_, &Some((CellState::Empty, ref right_items)), _, &Some((CellState::Empty, ref underneath)), &Some((CellState::Empty, ref bottom_right_items))) if right_items.len() == 0 && bottom_right_items.len() == 0 => {
                 if underneath.first().unwrap().borrow().is_hard() {
                     state.movement = Movement::RIGHT;
                     state.cell_move_state = CellMoveState::EXITING;
+                    self.momentum = true;
                 } else {
                     state.movement = Movement::NEUTRAL;
+                    self.momentum = false;
                 }
             },
             (&Some((CellState::Empty, ref left_items)), _, &Some((CellState::Empty, ref bottom_left_items)), &Some((CellState::Empty, ref underneath)), _) if left_items.len() == 0 && bottom_left_items.len() == 0 => {
                 if underneath.first().unwrap().borrow().is_hard() {
                     state.movement = Movement::LEFT;
                     state.cell_move_state = CellMoveState::EXITING;
+                    self.momentum = true;
                 } else {
                     state.movement = Movement::NEUTRAL;
+                    self.momentum = false;
                 }
             },
             _ => {
                 state.movement = Movement::NEUTRAL;
+                self.momentum = false;
             }
         };
     }

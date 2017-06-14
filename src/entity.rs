@@ -36,6 +36,7 @@ pub struct EntityState {
     pub id: u32,
     pub x: u32,
     pub y: u32,
+    pub destroyed: bool,
     pub pos_fraction: f32,
     pub movement: Movement,
     pub cell_move_state: CellMoveState,
@@ -56,6 +57,7 @@ impl Entity {
                 pos_fraction: 0.0,
                 movement: Movement::NEUTRAL,
                 cell_move_state: CellMoveState::NEUTRAL,
+                destroyed: false,
                 id: *id
             },
             entity_type: entity_type
@@ -163,6 +165,10 @@ impl Entity {
             },
             _ => ()
         }
+    }
+
+    pub fn destroy(&mut self) {
+        self.state.destroyed = true;
     }
 }
 

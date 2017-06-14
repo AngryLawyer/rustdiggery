@@ -7,11 +7,12 @@ use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use sdl2_engine_helpers::keyhandler::KeyHandler;
 use sdl2_engine_helpers::event_bus::EventBus;
 use map::{Map, CELL_SIZE};
-use entity::Movement;
+use entity::{Movement, RcEntity};
 
 pub enum GameEvent {
     MoveRequest(Movement),
-    Dig(u32, u32)
+    Dig(u32, u32),
+    Crushed(RcEntity)
 }
 
 pub struct GameScene {
