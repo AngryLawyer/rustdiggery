@@ -21,7 +21,7 @@ impl EntityType for Player {
         match key {
             Movement::UP => {
                 match adjacents.top {
-                    Some((ref tile, None)) if tile.is_passable() => {
+                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::UP;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -30,7 +30,7 @@ impl EntityType for Player {
             },
             Movement::DOWN => {
                 match adjacents.bottom {
-                    Some((ref tile, None)) if tile.is_passable() => {
+                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::DOWN;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -39,7 +39,7 @@ impl EntityType for Player {
             },
             Movement::LEFT => {
                 match adjacents.left {
-                    Some((ref tile, None)) if tile.is_passable() => {
+                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::LEFT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -48,7 +48,7 @@ impl EntityType for Player {
             },
             Movement::RIGHT => {
                 match adjacents.right {
-                    Some((ref tile, None)) if tile.is_passable() => {
+                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::RIGHT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
@@ -59,7 +59,7 @@ impl EntityType for Player {
         }
     }
 
-    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>)) {
+    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
         match cell_state {
             (CellState::Dirt, _) => {
                 event_bus.enqueue(GameEvent::Dig(state.x, state.y));

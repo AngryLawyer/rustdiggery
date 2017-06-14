@@ -44,7 +44,7 @@ impl CellState {
 pub struct Map {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
-    locations: HashMap<(u32, u32), RcEntity>,
+    locations: HashMap<(u32, u32), Vec<RcEntity>>,
     conflicts: HashMap<(u32, u32), Vec<RcEntity>>,
     pub player: RcEntity,
     pub width: u32,
@@ -52,14 +52,14 @@ pub struct Map {
 }
 
 pub struct Adjacents {
-    pub top_left: Option<(CellState, Option<RcEntity>)>,
-    pub top: Option<(CellState, Option<RcEntity>)>,
-    pub top_right: Option<(CellState, Option<RcEntity>)>,
-    pub left: Option<(CellState, Option<RcEntity>)>,
-    pub right: Option<(CellState, Option<RcEntity>)>,
-    pub bottom_left: Option<(CellState, Option<RcEntity>)>,
-    pub bottom: Option<(CellState, Option<RcEntity>)>,
-    pub bottom_right: Option<(CellState, Option<RcEntity>)>
+    pub top_left: Option<(CellState, Vec<RcEntity>)>,
+    pub top: Option<(CellState, Vec<RcEntity>)>,
+    pub top_right: Option<(CellState, Vec<RcEntity>)>,
+    pub left: Option<(CellState, Vec<RcEntity>)>,
+    pub right: Option<(CellState, Vec<RcEntity>)>,
+    pub bottom_left: Option<(CellState, Vec<RcEntity>)>,
+    pub bottom: Option<(CellState, Vec<RcEntity>)>,
+    pub bottom_right: Option<(CellState, Vec<RcEntity>)>
 }
 
 pub const CELL_SIZE: u32 = 32;
@@ -161,14 +161,10 @@ impl Map {
         }
     }
 
-    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
+    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Vec<RcEntity>) {
         let index = x + (y * self.width);
-        let mut item = match self.locations.get(&(x, y)) {
-            Some(item) => Some(item.clone()),
-            None => None
-        };
-
-        return (self.cells[index as usize].clone(), item);
+        let item = self.locations.get(&(x, y));
+        return (self.cells[index as usize].clone(), if item.is_some() { item.unwrap().clone() } else { vec![] });
     }
 
     pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
@@ -244,7 +240,14 @@ impl Map {
                 let entity = entity.borrow();
                 (entity.state.x, entity.state.y)
             };
-            self.locations.insert((x, y), entity.clone());
+            let new_list = match self.locations.remove(&(x, y)) {
+                Some(mut list) => {
+                    list.push(entity.clone());
+                    list
+                },
+                None => vec![entity.clone()]
+            };
+            self.locations.insert((x, y), new_list);
         }
     }
 
@@ -268,17 +271,12 @@ impl Map {
                 },
                 None => ()
             }
-            let (x, y) = {
-                let entity = entity.borrow();
-                (entity.state.x, entity.state.y)
-            };
-            self.locations.insert((x, y), entity.clone());
         }
 
         for list in self.conflicts.values() {
             if list.len() > 1 {
                 let priority = list.iter().filter(|item| item.borrow().is_hard()).max_by(|left, right| {
-                    if (right.borrow().state.pos_fraction > left.borrow().state.pos_fraction) {
+                    if right.borrow().state.pos_fraction > left.borrow().state.pos_fraction {
                         Ordering::Less
                     } else {
                         Ordering::Greater

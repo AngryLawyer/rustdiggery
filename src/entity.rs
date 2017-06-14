@@ -14,7 +14,7 @@ use game_scene::GameEvent;
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents);
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64);
-    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>));
+    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>));
     fn is_hard(&self) -> bool;
 }
 
@@ -114,7 +114,7 @@ impl Entity {
 
     }
 
-    pub fn collisions(&self, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>)) {
+    pub fn collisions(&self, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
         self.entity_type.collisions(&self.state, event_bus, cell_state)
     }
 
