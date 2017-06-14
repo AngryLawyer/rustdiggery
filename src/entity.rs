@@ -13,6 +13,7 @@ use game_scene::GameEvent;
 
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents);
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64);
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>));
 }
 
@@ -72,8 +73,11 @@ impl Entity {
         );
     }
 
+    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+        self.entity_type.think(&mut self.state, event_bus, adjacents, tick);
+    }
 
-    pub fn think(&mut self, tick: u64) {
+    pub fn process(&mut self, tick: u64) {
         // TODO: This should be an event
         match self.state.cell_move_state {
             CellMoveState::NEUTRAL => (),

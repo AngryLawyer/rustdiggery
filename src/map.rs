@@ -7,6 +7,7 @@ use transform::TransformContext;
 use game_scene::GameEvent;
 use sdl2_engine_helpers::event_bus::EventBus;
 use player::Player;
+use rock::Rock;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -68,13 +69,22 @@ impl Map {
         cells[width as usize + 2] = CellState::Empty;
         cells[(width as usize * 2) + 1] = CellState::Stone;
 
-        Map {
+        let mut map = Map {
             cells: cells,
             entities: entities,
             width: width,
             height: height,
             player: borrow
-        }
+        };
+
+        map.set_cell_state(5, 0, CellState::Empty);
+        map.set_cell_state(5, 1, CellState::Empty);
+        map.set_cell_state(5, 2, CellState::Empty);
+        map.set_cell_state(5, 3, CellState::Empty);
+        let rock = Entity::new(5, 0, Rock::new());
+        map.entities.push(rock);
+
+        map
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64, camera_pos: (u32, u32)) {
@@ -102,10 +112,14 @@ impl Map {
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
-        // TODO: Check for collisions
-        {
-            let player = self.player.borrow();
-            player.collisions(event_bus, self.at_pos(player.state.x, player.state.y));
+        for entity in &self.entities {
+            let entity = entity.borrow();
+            entity.collisions(event_bus, self.at_pos(entity.state.x, entity.state.y));
+        }
+        for entity in &self.entities {
+            let mut entity = entity.borrow_mut();
+            let adjacents = self.adjacents(entity.state.x, entity.state.y);
+            entity.think(event_bus, &adjacents, tick);
         }
         // Handle dealing with queued events
         while let Some(event) = event_bus.next() {
@@ -122,8 +136,9 @@ impl Map {
             }
         }
         // Do actual movement
-        let mut player = self.player.borrow_mut();
-        player.think(tick);
+        for entity in &self.entities {
+            entity.borrow_mut().process(tick);
+        }
     }
 
     /*pub fn render(&self, context: &graphics::Context, gl: &mut GlGraphics, tick: u64) {

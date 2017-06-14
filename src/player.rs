@@ -67,4 +67,7 @@ impl EntityType for Player {
             _ => ()
         }
     }
+
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    }
 }

@@ -7,6 +7,7 @@ pub mod entity;
 pub mod map;
 pub mod transform;
 pub mod player;
+pub mod rock;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
