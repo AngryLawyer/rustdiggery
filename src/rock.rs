@@ -27,14 +27,18 @@ impl EntityType for Rock {
             return;
         }
 
-        match adjacents.bottom {
-            Some((CellState::Empty, None)) => {
+        match (&adjacents.left, &adjacents.top, &adjacents.right, &adjacents.bottom) {
+            (_, _, _, &Some((CellState::Empty, None))) => {
                 state.movement = Movement::DOWN;
                 state.cell_move_state = CellMoveState::EXITING;
             },
             _ => {
                 state.movement = Movement::NEUTRAL;
             }
-        }
+        };
+    }
+
+    fn is_hard(&self) -> bool {
+        true
     }
 }

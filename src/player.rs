@@ -70,4 +70,8 @@ impl EntityType for Player {
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
     }
+
+    fn is_hard(&self) -> bool {
+        false
+    }
 }

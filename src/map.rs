@@ -8,6 +8,7 @@ use game_scene::GameEvent;
 use sdl2_engine_helpers::event_bus::EventBus;
 use player::Player;
 use rock::Rock;
+use std::collections::HashMap;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -42,16 +43,21 @@ impl CellState {
 pub struct Map {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
+    locations: HashMap<(u32, u32), RcEntity>,
     pub player: RcEntity,
     pub width: u32,
     pub height: u32
 }
 
 pub struct Adjacents {
+    pub top_left: Option<(CellState, Option<RcEntity>)>,
     pub top: Option<(CellState, Option<RcEntity>)>,
+    pub top_right: Option<(CellState, Option<RcEntity>)>,
     pub left: Option<(CellState, Option<RcEntity>)>,
+    pub right: Option<(CellState, Option<RcEntity>)>,
+    pub bottom_left: Option<(CellState, Option<RcEntity>)>,
     pub bottom: Option<(CellState, Option<RcEntity>)>,
-    pub right: Option<(CellState, Option<RcEntity>)>
+    pub bottom_right: Option<(CellState, Option<RcEntity>)>
 }
 
 pub const CELL_SIZE: u32 = 32;
@@ -74,7 +80,8 @@ impl Map {
             entities: entities,
             width: width,
             height: height,
-            player: borrow
+            player: borrow,
+            locations: HashMap::new()
         };
 
         map.set_cell_state(5, 0, CellState::Empty);
@@ -104,7 +111,7 @@ impl Map {
             transform.fill_rect(renderer, Rect::new(x as i32, y as i32, CELL_SIZE, CELL_SIZE));
         };
 
-        for entity in self.entities.iter() {
+        for entity in &self.entities {
             entity.borrow().render(renderer, &transform, engine_data, tick);
         }
 
@@ -112,6 +119,9 @@ impl Map {
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+        // Update our location grid
+        self.update_location_grid();
+
         for entity in &self.entities {
             let entity = entity.borrow();
             entity.collisions(event_bus, self.at_pos(entity.state.x, entity.state.y));
@@ -143,33 +153,29 @@ impl Map {
 
     pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Option<RcEntity>) {
         let index = x + (y * self.width);
-        let mut item = None;
-        for entity in &self.entities {
-            let entity = entity.clone();
-            {
-                let borrowed = entity.try_borrow();
-                let matched = match borrowed {
-                    Ok(borrowed) => {
-                        if borrowed.state.x == x && borrowed.state.y == y {
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                    _ => false
-                };
-                if matched {
-                    item = Some(entity.clone());
-                    break;
-                }
-            }
-        }
+        let mut item = match self.locations.get(&(x, y)) {
+            Some(item) => Some(item.clone()),
+            None => None
+        };
+
         return (self.cells[index as usize].clone(), item);
     }
 
     pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
+        let top_left = if y > 0 && x > 0 {
+            Some(self.at_pos(x - 1, y - 1))
+        } else {
+            None
+        };
+
         let top = if y > 0 {
             Some(self.at_pos(x, y - 1))
+        } else {
+            None
+        };
+
+        let top_right = if y > 0 && x < self.width - 1 {
+            Some(self.at_pos(x - 1, y - 1))
         } else {
             None
         };
@@ -180,24 +186,56 @@ impl Map {
             None
         };
 
-        let bottom = if y < self.height - 1 {
-            Some(self.at_pos(x, y + 1))
-        } else {
-            None
-        };
-
         let right = if x < self.width - 1 {
             Some(self.at_pos(x + 1, y))
         } else {
             None
         };
 
-        Adjacents{top: top, left: left, bottom: bottom, right: right}
+        let bottom_left = if y < self.height - 1 && x > 0 {
+            Some(self.at_pos(x - 1, y + 1))
+        } else {
+            None
+        };
+
+        let bottom = if y < self.height - 1 {
+            Some(self.at_pos(x, y + 1))
+        } else {
+            None
+        };
+
+        let bottom_right = if y < self.height - 1 && x < self.width - 1 {
+            Some(self.at_pos(x + 1, y + 1))
+        } else {
+            None
+        };
+
+        Adjacents{
+            top_left: top_left,
+            top: top,
+            top_right: top_right,
+            left: left,
+            right: right,
+            bottom_left: bottom_left,
+            bottom: bottom,
+            bottom_right: bottom_right
+        }
     }
 
     pub fn set_cell_state(&mut self, x: u32, y: u32, state: CellState) {
         let index = x + (y * self.width);
         self.cells[index as usize] = state;
+    }
+
+    pub fn update_location_grid(&mut self) {
+        self.locations.clear();
+        for entity in &self.entities {
+            let (x, y) = {
+                let entity = entity.borrow();
+                (entity.state.x, entity.state.y)
+            };
+            self.locations.insert((x, y), entity.clone());
+        }
     }
 }
 

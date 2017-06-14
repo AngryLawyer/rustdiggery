@@ -15,6 +15,7 @@ pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents);
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64);
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Option<RcEntity>));
+    fn is_hard(&self) -> bool;
 }
 
 pub enum Movement {
@@ -129,6 +130,10 @@ impl Entity {
             ((self.state.x * CELL_SIZE) as i32 + (CELL_SIZE as f32 * x_offset) as i32) as i32,
             ((self.state.y * CELL_SIZE) as i32 + (CELL_SIZE as f32 * y_offset) as i32) as i32,
         )
+    }
+
+    pub fn is_hard(&self) -> bool {
+        self.entity_type.is_hard()
     }
 }
 
