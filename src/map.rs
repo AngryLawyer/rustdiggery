@@ -69,7 +69,7 @@ impl Map {
         let mut ids = 0;
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        let player = Entity::new(1,1, Player::new(), &mut ids);
+        let player = Entity::new(0,1, Player::new(), &mut ids);
         let borrow = player.clone();
         entities.push(player);
         cells[1] = CellState::Empty;
@@ -190,6 +190,9 @@ impl Map {
                         }
                     }
                 },
+                GameEvent::Push(dir, item) => {
+                    item.borrow_mut().push(dir, tick);
+                }
                 _ => ()
             }
         }
@@ -223,7 +226,7 @@ impl Map {
         };
 
         let top_right = if y > 0 && x < self.width - 1 {
-            Some(self.at_pos(x - 1, y - 1))
+            Some(self.at_pos(x + 1, y - 1))
         } else {
             None
         };
@@ -258,7 +261,7 @@ impl Map {
             None
         };
 
-        Adjacents{
+        Adjacents {
             top_left: top_left,
             top: top,
             top_right: top_right,

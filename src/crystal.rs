@@ -32,4 +32,7 @@ impl EntityType for Crystal {
     fn is_hard(&self) -> bool {
         true
     }
+
+    fn push(&mut self, direction: Movement, tick: u64) {
+    }
 }

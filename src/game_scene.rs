@@ -13,7 +13,8 @@ pub enum GameEvent {
     MoveRequest(Movement),
     Dig(u32, u32),
     Crushed(RcEntity),
-    Explosion(u32, u32)
+    Explosion(u32, u32),
+    Push(Movement, RcEntity),
 }
 
 pub struct GameScene {

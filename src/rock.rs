@@ -4,14 +4,18 @@ use game_scene::GameEvent;
 use map::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 
+const PUSH_AMPLITUDE: u32 = 10;
+
 pub struct Rock {
     momentum: bool,
+    pushing: (Movement, u32, u64),
 }
 
 impl Rock {
     pub fn new() -> Box<EntityType> {
         Box::new(Rock {
-            momentum: false
+            momentum: false,
+            pushing: (Movement::NEUTRAL, 0, 0)
         })
     }
 }
@@ -93,9 +97,46 @@ impl EntityType for Rock {
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
         think(state, event_bus, adjacents, tick, &mut self.momentum);
+
+        if state.pos_fraction != 0.0 {
+            return;
+        }
+        let reset = match self.pushing {
+            (ref dir, amplitude, push_tick) => {
+                if tick - 1 > push_tick {
+                    true
+                } else if amplitude >= PUSH_AMPLITUDE {
+                    match (dir, &adjacents.left, &adjacents.right) {
+                        (&Movement::LEFT, &Some((CellState::Empty, ref items)), _) if items.len() == 0 => {
+                            state.movement = Movement::LEFT;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        },
+                        (&Movement::RIGHT, _, &Some((CellState::Empty, ref items))) if items.len() == 0 => {
+                            state.movement = Movement::RIGHT;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        },
+                        _ => ()
+                    };
+                    false
+                } else {
+                    false
+                }
+            }
+        };
+        if reset {
+            self.pushing = (Movement::NEUTRAL, 0, 0);
+        }
     }
 
     fn is_hard(&self) -> bool {
         true
+    }
+
+    fn push(&mut self, direction: Movement, tick: u64) {
+        match self.pushing {
+            (_, amplitude, _) => {
+                self.pushing = (direction, amplitude + 1, tick);
+            }
+        }
     }
 }

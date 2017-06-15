@@ -4,11 +4,15 @@ use game_scene::GameEvent;
 use map::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 
-pub struct Player;
+pub struct Player {
+    pushing: Movement,
+}
 
 impl Player {
     pub fn new() -> Box<EntityType> {
-        Box::new(Player)
+        Box::new(Player {
+            pushing: Movement::NEUTRAL,
+        })
     }
 }
 
@@ -43,6 +47,9 @@ impl EntityType for Player {
                         state.movement = Movement::LEFT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
+                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                        self.pushing = Movement::LEFT;
+                    },
                     _ => ()
                 }
             },
@@ -51,6 +58,9 @@ impl EntityType for Player {
                     Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::RIGHT;
                         state.cell_move_state = CellMoveState::EXITING;
+                    },
+                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                        self.pushing = Movement::RIGHT;
                     },
                     _ => ()
                 }
@@ -69,9 +79,28 @@ impl EntityType for Player {
     }
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+        match (&self.pushing, &adjacents.left, &adjacents.right) {
+            (&Movement::LEFT, &Some((_, ref items)), _) if items.len() > 0 => {
+                let item = items.first().unwrap();
+                if item.borrow().is_hard() {
+                    event_bus.enqueue(GameEvent::Push(Movement::LEFT, item.clone()));
+                }
+            },
+            (&Movement::RIGHT, _, &Some((_, ref items))) if items.len() > 0 => {
+                let item = items.first().unwrap();
+                if item.borrow().is_hard() {
+                    event_bus.enqueue(GameEvent::Push(Movement::RIGHT, item.clone()));
+                }
+            },
+            _ => ()
+        };
+        self.pushing = Movement::NEUTRAL;
     }
 
     fn is_hard(&self) -> bool {
         false
+    }
+
+    fn push(&mut self, direction: Movement, tick: u64) {
     }
 }

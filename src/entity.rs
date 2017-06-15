@@ -16,8 +16,10 @@ pub trait EntityType {
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64);
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>));
     fn is_hard(&self) -> bool;
+    fn push(&mut self, direction: Movement, tick: u64);
 }
 
+#[derive(Clone)]
 pub enum Movement {
     NEUTRAL,
     LEFT,
@@ -169,6 +171,10 @@ impl Entity {
 
     pub fn destroy(&mut self) {
         self.state.destroyed = true;
+    }
+
+    pub fn push(&mut self, direction: Movement, tick: u64) {
+        self.entity_type.push(direction, tick);
     }
 }
 
