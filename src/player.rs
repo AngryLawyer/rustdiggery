@@ -29,6 +29,13 @@ impl EntityType for Player {
                         state.movement = Movement::UP;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
+                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                        let item = items.first().unwrap().borrow();
+                        if item.is_enterable() {
+                            state.movement = Movement::UP;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        }
+                    },
                     _ => ()
                 }
             },
@@ -37,6 +44,13 @@ impl EntityType for Player {
                     Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::DOWN;
                         state.cell_move_state = CellMoveState::EXITING;
+                    },
+                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                        let item = items.first().unwrap().borrow();
+                        if item.is_enterable() {
+                            state.movement = Movement::DOWN;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        }
                     },
                     _ => ()
                 }
@@ -48,7 +62,13 @@ impl EntityType for Player {
                         state.cell_move_state = CellMoveState::EXITING;
                     },
                     Some((CellState::Empty, ref items)) if items.len() == 1 => {
-                        self.pushing = Movement::LEFT;
+                        let item = items.first().unwrap().borrow();
+                        if item.is_enterable() {
+                            state.movement = Movement::LEFT;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        } else {
+                            self.pushing = Movement::LEFT;
+                        }
                     },
                     _ => ()
                 }
@@ -60,7 +80,13 @@ impl EntityType for Player {
                         state.cell_move_state = CellMoveState::EXITING;
                     },
                     Some((CellState::Empty, ref items)) if items.len() == 1 => {
-                        self.pushing = Movement::RIGHT;
+                        let item = items.first().unwrap().borrow();
+                        if item.is_enterable() {
+                            state.movement = Movement::RIGHT;
+                            state.cell_move_state = CellMoveState::EXITING;
+                        } else {
+                            self.pushing = Movement::RIGHT;
+                        }
                     },
                     _ => ()
                 }
@@ -98,6 +124,10 @@ impl EntityType for Player {
     }
 
     fn is_hard(&self) -> bool {
+        false
+    }
+
+    fn is_enterable(&self) -> bool {
         false
     }
 

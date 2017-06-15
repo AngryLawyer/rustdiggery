@@ -33,6 +33,10 @@ impl EntityType for Crystal {
         true
     }
 
+    fn is_enterable(&self) -> bool {
+        true
+    }
+
     fn push(&mut self, direction: Movement, tick: u64) {
     }
 }

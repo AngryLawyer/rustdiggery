@@ -132,6 +132,10 @@ impl EntityType for Rock {
         true
     }
 
+    fn is_enterable(&self) -> bool {
+        false
+    }
+
     fn push(&mut self, direction: Movement, tick: u64) {
         match self.pushing {
             (_, amplitude, _) => {
