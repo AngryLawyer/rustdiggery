@@ -13,11 +13,17 @@ use game_scene::GameEvent;
 use game_data::GameData;
 
 pub trait EntityType {
-    fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents);
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64);
-    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>));
-    fn is_hard(&self) -> bool;
-    fn push(&mut self, direction: Movement, tick: u64);
+    fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents) {
+    }
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    }
+    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
+    }
+    fn is_hard(&self) -> bool {
+        false
+    }
+    fn push(&mut self, direction: Movement, tick: u64) {
+    }
     fn is_enterable(&self) -> bool {
         false
     }

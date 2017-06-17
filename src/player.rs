@@ -129,17 +129,6 @@ impl EntityType for Player {
         self.pushing = Movement::NEUTRAL;
     }
 
-    fn is_hard(&self) -> bool {
-        false
-    }
-
-    fn is_enterable(&self) -> bool {
-        false
-    }
-
-    fn push(&mut self, direction: Movement, tick: u64) {
-    }
-
     fn is_player(&self) -> bool {
         true
     }

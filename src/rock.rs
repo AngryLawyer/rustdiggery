@@ -98,9 +98,6 @@ pub fn think(state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjac
 }
 
 impl EntityType for Rock {
-    fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents) {
-    }
-
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
         handle_collisions(state, event_bus, cell_state, self.momentum);
     }
