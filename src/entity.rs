@@ -10,6 +10,7 @@ use transform::TransformContext;
 use map::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 use game_scene::GameEvent;
+use game_data::GameData;
 
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents);
@@ -23,7 +24,7 @@ pub trait EntityType {
     fn is_collectible(&self) -> bool {
         false
     }
-    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
         transform.fill_rect(
             renderer,
@@ -86,7 +87,7 @@ impl Entity {
         item
     }
 
-    pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
+    pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         self.entity_type.render(renderer, transform, engine_data, tick);
     }
 

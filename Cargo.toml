@@ -4,8 +4,10 @@ name = "rustdiggery"
 version = "0.0.1"
 authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
 
-[dependencies]
-sdl2 = "0.30"
+[dependencies.sdl2]
+version = "0.30"
+default-features = false
+features = ["image"]
 
 [dependencies.sdl2-engine-helpers]
 path = "/Users/tony/Projects/rust-sdl2-engine-helpers"

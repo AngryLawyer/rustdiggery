@@ -5,6 +5,7 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use game_scene::GameScene;
+use game_data::GameData;
 
 pub struct TitleScene {
     quitting: bool,
@@ -12,7 +13,7 @@ pub struct TitleScene {
 }
 
 impl TitleScene {
-    pub fn new() -> BoxedScene<Event, Canvas<Window>, ()> {
+    pub fn new() -> BoxedScene<Event, Canvas<Window>, GameData> {
         Box::new(TitleScene {
             quitting: false,
             continuing: false
@@ -20,16 +21,16 @@ impl TitleScene {
     }
 }
 
-impl Scene<Event, Canvas<Window>, ()> for TitleScene {
+impl Scene<Event, Canvas<Window>, GameData> for TitleScene {
 
-    fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         let color = (tick % 256) as u8;
         renderer.set_draw_color(Color::RGB(color, color, color));
         renderer.clear();
         renderer.present();
     }
 
-    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
+    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) {
         match *event {
             Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
             Event::KeyDown {..} => self.continuing = true,
@@ -37,7 +38,7 @@ impl Scene<Event, Canvas<Window>, ()> for TitleScene {
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else if self.continuing {

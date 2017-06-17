@@ -11,6 +11,7 @@ use rock::Rock;
 use crystal::Crystal;
 use std::collections::HashMap;
 use std::cmp::Ordering;
+use game_data::GameData;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -108,7 +109,7 @@ impl Map {
         map
     }
 
-    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64, camera_pos: (u32, u32)) {
+    pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64, camera_pos: (u32, u32)) {
         let (camera_x, camera_y) = camera_pos;
         renderer.set_draw_color(Color::RGB(0, 0, 0));
         renderer.clear();
@@ -135,7 +136,7 @@ impl Map {
         renderer.present();
     }
 
-    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         // Update our location grid
         self.update_location_grid();
 

@@ -8,6 +8,7 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
+use game_data::GameData;
 
 const PUSH_AMPLITUDE: u32 = 10;
 
@@ -141,7 +142,7 @@ impl EntityType for Rock {
         true
     }
 
-    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 255, 100));
         transform.fill_rect(
             renderer,

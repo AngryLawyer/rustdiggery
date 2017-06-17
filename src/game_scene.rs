@@ -8,6 +8,7 @@ use sdl2_engine_helpers::keyhandler::KeyHandler;
 use sdl2_engine_helpers::event_bus::EventBus;
 use map::{Map, CELL_SIZE};
 use entity::{Movement, RcEntity};
+use game_data::GameData;
 
 pub enum GameEvent {
     MoveRequest(Movement),
@@ -28,7 +29,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, ()> {
+    pub fn new(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, GameData> {
         let mut scene = Box::new(GameScene {
             quitting: false,
             map: Map::new(50, 50),
@@ -71,20 +72,20 @@ impl GameScene {
 
 }
 
-impl Scene<Event, Canvas<Window>, ()> for GameScene {
+impl Scene<Event, Canvas<Window>, GameData> for GameScene {
 
-    fn render(&self, renderer: &mut Canvas<Window>, engine_data: &(), tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         self.map.render(renderer, engine_data, tick, self.camera_pos);
     }
 
-    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) {
+    fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) {
         match event {
             &Event::KeyDown {keycode: Some(Keycode::Escape), ..} => self.quitting = true,
             e => self.keyhandler.handle_event(e)
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut (), tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, ()>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {

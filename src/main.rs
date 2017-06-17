@@ -9,12 +9,15 @@ pub mod transform;
 pub mod player;
 pub mod rock;
 pub mod crystal;
+pub mod game_data;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
 use sdl2::event::Event;
+use sdl2::image::{LoadTexture, INIT_PNG};
 
 use title_scene::TitleScene;
+use game_data::GameData;
 
 fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
@@ -32,6 +35,8 @@ fn main() {
         .build()
         .expect("Could not get Canvas");
 
+    let mut game_data = GameData;
+
     let mut scene_stack = SceneStack::new();
     scene_stack.push(TitleScene::new());
 
@@ -48,12 +53,12 @@ fn main() {
                         return true
                     },
                     _ => {
-                        scene_stack.handle_event(&event, &mut canvas, &mut (), frame_number);
+                        scene_stack.handle_event(&event, &mut canvas, &mut game_data, frame_number);
                     }
                 }
             };
-            scene_stack.think(&mut canvas, &mut (), frame_number);
-            scene_stack.render(&mut canvas, &(), frame_number);
+            scene_stack.think(&mut canvas, &mut game_data, frame_number);
+            scene_stack.render(&mut canvas, &game_data, frame_number);
             false
         }
     });
