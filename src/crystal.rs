@@ -28,7 +28,7 @@ impl EntityType for Crystal {
     }
 
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
-        handle_collisions(state, event_bus, cell_state, self.momentum)
+        handle_collisions(state, event_bus, cell_state, self.momentum);
     }
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
@@ -61,5 +61,9 @@ impl EntityType for Crystal {
                 CELL_SIZE
             )
         );
+    }
+
+    fn score(&self) -> u32 {
+        1
     }
 }

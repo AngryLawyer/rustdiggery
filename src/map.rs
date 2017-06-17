@@ -50,7 +50,9 @@ pub struct Map {
     conflicts: HashMap<(u32, u32), Vec<RcEntity>>,
     pub player: RcEntity,
     pub width: u32,
-    pub height: u32
+    pub height: u32,
+    pub crystals_to_pass: u32,
+    pub crystals_collected: u32,
 }
 
 pub struct Adjacents {
@@ -87,7 +89,9 @@ impl Map {
             height: height,
             player: borrow,
             locations: HashMap::new(),
-            conflicts: HashMap::new()
+            conflicts: HashMap::new(),
+            crystals_to_pass: 20,
+            crystals_collected: 0,
         };
 
         map.set_cell_state(5, 0, CellState::Empty);
@@ -169,8 +173,9 @@ impl Map {
                     event_bus.enqueue(GameEvent::Explosion(x, y));
                 },
                 GameEvent::Collect(item) => {
-                    // TODO: increment score?
                     item.borrow_mut().destroy();
+                    self.crystals_collected += item.borrow().score();
+                    // TODO: Open exit
                 },
                 GameEvent::Explosion(x, y) => {
                     let (x, y) = (x as i64, y as i64);

@@ -139,4 +139,8 @@ impl EntityType for Player {
 
     fn push(&mut self, direction: Movement, tick: u64) {
     }
+
+    fn is_player(&self) -> bool {
+        true
+    }
 }

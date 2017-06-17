@@ -24,6 +24,12 @@ pub trait EntityType {
     fn is_collectible(&self) -> bool {
         false
     }
+    fn is_player(&self) -> bool {
+        false
+    }
+    fn score(&self) -> u32 {
+        0
+    }
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
         transform.fill_rect(
@@ -192,6 +198,14 @@ impl Entity {
 
     pub fn is_collectible(&self) -> bool {
         self.entity_type.is_collectible()
+    }
+
+    pub fn is_player(&self) -> bool {
+        self.entity_type.is_player()
+    }
+
+    pub fn score(&self) -> u32 {
+        self.entity_type.score()
     }
 }
 
