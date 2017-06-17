@@ -36,6 +36,11 @@ pub trait EntityType {
     fn score(&self) -> u32 {
         0
     }
+    fn open_exit(&mut self) {
+    }
+    fn destructable(&self) -> bool {
+        true
+    }
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
         transform.fill_rect(
@@ -212,6 +217,14 @@ impl Entity {
 
     pub fn score(&self) -> u32 {
         self.entity_type.score()
+    }
+
+    pub fn open_exit(&mut self) {
+        self.entity_type.open_exit()
+    }
+
+    pub fn destructable(&self) -> bool {
+        self.entity_type.destructable()
     }
 }
 

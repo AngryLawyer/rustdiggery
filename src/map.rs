@@ -1,17 +1,18 @@
-use sdl2::pixels::Color;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
-use sdl2::rect::Rect;
+use crystal::Crystal;
 use entity::{Entity, RcEntity};
-use transform::TransformContext;
+use exit::Exit;
+use game_data::GameData;
 use game_scene::GameEvent;
-use sdl2_engine_helpers::event_bus::EventBus;
 use player::Player;
 use rock::Rock;
-use crystal::Crystal;
-use std::collections::HashMap;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
+use sdl2_engine_helpers::event_bus::EventBus;
 use std::cmp::Ordering;
-use game_data::GameData;
+use std::collections::HashMap;
+use transform::TransformContext;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -90,7 +91,7 @@ impl Map {
             player: borrow,
             locations: HashMap::new(),
             conflicts: HashMap::new(),
-            crystals_to_pass: 20,
+            crystals_to_pass: 1,
             crystals_collected: 0,
         };
 
@@ -101,6 +102,7 @@ impl Map {
         map.set_cell_state(6, 1, CellState::Empty);
         map.set_cell_state(6, 2, CellState::Empty);
         map.set_cell_state(6, 3, CellState::Empty);
+        map.set_cell_state(9, 9, CellState::Empty);
         let rock = Entity::new(5, 0, Rock::new(), &mut ids);
         map.entities.push(rock);
         let rock = Entity::new(5, 1, Rock::new(), &mut ids);
@@ -109,6 +111,8 @@ impl Map {
         map.entities.push(rock);
         let crystal = Entity::new(5, 3, Crystal::new(), &mut ids);
         map.entities.push(crystal);
+        let exit = Entity::new(9, 9, Exit::new(), &mut ids);
+        map.entities.push(exit);
 
         map
     }
@@ -175,7 +179,12 @@ impl Map {
                 GameEvent::Collect(item) => {
                     item.borrow_mut().destroy();
                     self.crystals_collected += item.borrow().score();
-                    // TODO: Open exit
+                    if self.crystals_collected >= self.crystals_to_pass {
+                        for entity in &self.entities {
+                            let mut entity = entity.borrow_mut();
+                            entity.open_exit();
+                        }
+                    }
                 },
                 GameEvent::Explosion(x, y) => {
                     let (x, y) = (x as i64, y as i64);
@@ -201,7 +210,9 @@ impl Map {
                             _ => self.set_cell_state(x, y, CellState::Empty)
                         };
                         for item in items {
-                            item.borrow_mut().destroy();
+                            if item.borrow().destructable() {
+                                item.borrow_mut().destroy();
+                            }
                         }
                     }
                 },
@@ -368,7 +379,6 @@ impl Map {
             }
         }
     }
-
 
     pub fn cleanup(&mut self) {
         self.entities = self.entities.iter().filter_map(|entity| {
