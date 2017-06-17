@@ -22,6 +22,7 @@ use game_data::GameData;
 fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
     let video_subsystem = sdl_context.video().expect("Could not initialize video subsystem");
+    let image_context = sdl2::image::init(INIT_PNG).expect("Could not initialize SDL_Image context");
     let window = video_subsystem.window("RustDiggery", 800, 600)
         .position_centered()
         .opengl()
