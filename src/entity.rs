@@ -23,6 +23,18 @@ pub trait EntityType {
     fn is_collectible(&self) -> bool {
         false
     }
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
+        renderer.set_draw_color(Color::RGB(255, 0, 0));
+        transform.fill_rect(
+            renderer,
+            Rect::new(
+                0,
+                0,
+                CELL_SIZE,
+                CELL_SIZE
+            )
+        );
+    }
 }
 
 #[derive(Clone)]
@@ -75,17 +87,7 @@ impl Entity {
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
-        renderer.set_draw_color(Color::RGB(255, 0, 0));
-        let (x, y) = self.get_abs_position();
-        transform.fill_rect(
-            renderer,
-            Rect::new(
-                x,
-                y,
-                CELL_SIZE,
-                CELL_SIZE
-            )
-        );
+        self.entity_type.render(renderer, transform, engine_data, tick);
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {

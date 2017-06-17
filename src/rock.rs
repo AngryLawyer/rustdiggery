@@ -1,8 +1,13 @@
-use map::{CELL_SIZE, Adjacents};
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
 use game_scene::GameEvent;
 use map::CellState;
+use map::{CELL_SIZE, Adjacents};
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
+use transform::TransformContext;
 
 const PUSH_AMPLITUDE: u32 = 10;
 
@@ -136,8 +141,17 @@ impl EntityType for Rock {
         true
     }
 
-    fn is_enterable(&self) -> bool {
-        false
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &(), tick: u64) {
+        renderer.set_draw_color(Color::RGB(255, 255, 100));
+        transform.fill_rect(
+            renderer,
+            Rect::new(
+                0,
+                0,
+                CELL_SIZE,
+                CELL_SIZE
+            )
+        );
     }
 
     fn push(&mut self, direction: Movement, tick: u64) {

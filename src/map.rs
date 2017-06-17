@@ -126,7 +126,10 @@ impl Map {
         };
 
         for entity in &self.entities {
-            entity.borrow().render(renderer, &transform, engine_data, tick);
+            let entity = entity.borrow();
+            let (x, y) = entity.get_abs_position();
+            let transform = transform.transform(x, y);
+            entity.render(renderer, &transform, engine_data, tick);
         }
 
         renderer.present();
