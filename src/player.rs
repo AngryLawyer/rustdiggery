@@ -100,6 +100,12 @@ impl EntityType for Player {
             (CellState::Dirt, _) => {
                 event_bus.enqueue(GameEvent::Dig(state.x, state.y));
             },
+            (_, ref items) if items.len() > 0 => {
+                let item = items.first().unwrap();
+                if item.borrow().is_collectible() {
+                    event_bus.enqueue(GameEvent::Collect(item.clone()));
+                }
+            },
             _ => ()
         }
     }

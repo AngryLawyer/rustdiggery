@@ -17,7 +17,12 @@ pub trait EntityType {
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>));
     fn is_hard(&self) -> bool;
     fn push(&mut self, direction: Movement, tick: u64);
-    fn is_enterable(&self) -> bool;
+    fn is_enterable(&self) -> bool {
+        false
+    }
+    fn is_collectible(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Clone)]
@@ -180,6 +185,10 @@ impl Entity {
 
     pub fn is_enterable(&self) -> bool {
         self.entity_type.is_enterable()
+    }
+
+    pub fn is_collectible(&self) -> bool {
+        self.entity_type.is_collectible()
     }
 }
 

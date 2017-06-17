@@ -15,6 +15,7 @@ pub enum GameEvent {
     Crushed(RcEntity),
     Explosion(u32, u32),
     Push(Movement, RcEntity),
+    Collect(RcEntity),
 }
 
 pub struct GameScene {

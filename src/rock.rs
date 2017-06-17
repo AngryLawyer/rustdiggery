@@ -20,7 +20,11 @@ impl Rock {
     }
 }
 
-pub fn handle_collisions(state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
+pub fn handle_collisions(state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>), momentum: bool) {
+    if !momentum {
+        return;
+    }
+
     match cell_state {
         (_, ref items) if items.len() > 0 => {
             for item in items {
@@ -92,7 +96,7 @@ impl EntityType for Rock {
     }
 
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
-        handle_collisions(state, event_bus, cell_state);
+        handle_collisions(state, event_bus, cell_state, self.momentum);
     }
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {

@@ -8,6 +8,7 @@ use game_scene::GameEvent;
 use sdl2_engine_helpers::event_bus::EventBus;
 use player::Player;
 use rock::Rock;
+use crystal::Crystal;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 
@@ -101,6 +102,8 @@ impl Map {
         map.entities.push(rock);
         let rock = Entity::new(5, 2, Rock::new(), &mut ids);
         map.entities.push(rock);
+        let crystal = Entity::new(5, 3, Crystal::new(), &mut ids);
+        map.entities.push(crystal);
 
         map
     }
@@ -135,7 +138,7 @@ impl Map {
 
         for entity in &self.entities {
             let entity = entity.borrow();
-            entity.collisions(event_bus, self.at_pos(entity.state.x, entity.state.y));
+            entity.collisions(event_bus, self.at_pos(entity.state.x, entity.state.y, Some(entity.state.id)));
         }
         for entity in &self.entities {
             let mut entity = entity.borrow_mut();
@@ -154,13 +157,16 @@ impl Map {
                     self.set_cell_state(x, y, CellState::Empty);
                 },
                 GameEvent::Crushed(item) => {
-                    // TODO: Explosions!
                     let (x, y) = {
                         let item = item.borrow();
                         (item.state.x, item.state.y)
                     };
                     item.borrow_mut().destroy();
                     event_bus.enqueue(GameEvent::Explosion(x, y));
+                },
+                GameEvent::Collect(item) => {
+                    // TODO: increment score?
+                    item.borrow_mut().destroy();
                 },
                 GameEvent::Explosion(x, y) => {
                     let (x, y) = (x as i64, y as i64);
@@ -180,7 +186,7 @@ impl Map {
                         x >= 0 && y >= 0 && x < width && y < height
                     }) {
                         let (x, y) = (x as u32, y as u32);
-                        let (state, items) = self.at_pos(x, y);
+                        let (state, items) = self.at_pos(x, y, None);
                         match state {
                             CellState::Wall => {},
                             _ => self.set_cell_state(x, y, CellState::Empty)
@@ -206,57 +212,66 @@ impl Map {
         }
     }
 
-    pub fn at_pos(&self, x: u32, y: u32) -> (CellState, Vec<RcEntity>) {
+    pub fn at_pos(&self, x: u32, y: u32, checking_id: Option<u32>) -> (CellState, Vec<RcEntity>) {
         let index = x + (y * self.width);
         let item = self.locations.get(&(x, y));
-        return (self.cells[index as usize].clone(), if item.is_some() { item.unwrap().clone() } else { vec![] });
+        let entities = match (item, checking_id) {
+            (Some(items), Some(check)) => {
+                items.iter().filter_map(|item| { if item.borrow().state.id != check { Some(item.clone()) } else { None } }).collect::<Vec<_>>()
+            },
+            (Some(items), None) => {
+                items.clone()
+            },
+            _ => vec![]
+        };
+        (self.cells[index as usize].clone(), entities)
     }
 
     pub fn adjacents(&self, x: u32, y: u32) -> Adjacents {
         let top_left = if y > 0 && x > 0 {
-            Some(self.at_pos(x - 1, y - 1))
+            Some(self.at_pos(x - 1, y - 1, None))
         } else {
             None
         };
 
         let top = if y > 0 {
-            Some(self.at_pos(x, y - 1))
+            Some(self.at_pos(x, y - 1, None))
         } else {
             None
         };
 
         let top_right = if y > 0 && x < self.width - 1 {
-            Some(self.at_pos(x + 1, y - 1))
+            Some(self.at_pos(x + 1, y - 1, None))
         } else {
             None
         };
 
         let left = if x > 0 {
-            Some(self.at_pos(x - 1, y))
+            Some(self.at_pos(x - 1, y, None))
         } else {
             None
         };
 
         let right = if x < self.width - 1 {
-            Some(self.at_pos(x + 1, y))
+            Some(self.at_pos(x + 1, y, None))
         } else {
             None
         };
 
         let bottom_left = if y < self.height - 1 && x > 0 {
-            Some(self.at_pos(x - 1, y + 1))
+            Some(self.at_pos(x - 1, y + 1, None))
         } else {
             None
         };
 
         let bottom = if y < self.height - 1 {
-            Some(self.at_pos(x, y + 1))
+            Some(self.at_pos(x, y + 1, None))
         } else {
             None
         };
 
         let bottom_right = if y < self.height - 1 && x < self.width - 1 {
-            Some(self.at_pos(x + 1, y + 1))
+            Some(self.at_pos(x + 1, y + 1, None))
         } else {
             None
         };
