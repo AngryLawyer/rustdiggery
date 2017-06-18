@@ -55,7 +55,7 @@ pub trait EntityType {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum Movement {
     NEUTRAL,
     LEFT,
@@ -64,6 +64,7 @@ pub enum Movement {
     DOWN
 }
 
+#[derive(Eq, PartialEq)]
 pub enum CellMoveState {
     NEUTRAL,
     ENTERING,
