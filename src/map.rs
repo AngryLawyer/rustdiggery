@@ -57,15 +57,17 @@ pub struct Map {
     pub crystals_collected: u32,
 }
 
+type Adjacent = Option<(CellState, Vec<RcEntity>)>;
+
 pub struct Adjacents {
-    pub top_left: Option<(CellState, Vec<RcEntity>)>,
-    pub top: Option<(CellState, Vec<RcEntity>)>,
-    pub top_right: Option<(CellState, Vec<RcEntity>)>,
-    pub left: Option<(CellState, Vec<RcEntity>)>,
-    pub right: Option<(CellState, Vec<RcEntity>)>,
-    pub bottom_left: Option<(CellState, Vec<RcEntity>)>,
-    pub bottom: Option<(CellState, Vec<RcEntity>)>,
-    pub bottom_right: Option<(CellState, Vec<RcEntity>)>
+    pub top_left: Adjacent,
+    pub top: Adjacent,
+    pub top_right: Adjacent,
+    pub left: Adjacent,
+    pub right: Adjacent,
+    pub bottom_left: Adjacent,
+    pub bottom: Adjacent,
+    pub bottom_right: Adjacent,
 }
 
 pub const CELL_SIZE: u32 = 32;
