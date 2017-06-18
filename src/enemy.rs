@@ -102,6 +102,7 @@ impl EntityType for Enemy {
                     if self.check_move(state, adjacents) {
                         return;
                     } else {
+                        self.turn();
                         count += 1;
                     }
                 }

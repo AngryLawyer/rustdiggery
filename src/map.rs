@@ -1,4 +1,5 @@
 use crystal::Crystal;
+use enemy::{TurnDir, Enemy};
 use entity::{Entity, RcEntity};
 use exit::Exit;
 use game_data::GameData;
@@ -103,6 +104,11 @@ impl Map {
         map.set_cell_state(6, 2, CellState::Empty);
         map.set_cell_state(6, 3, CellState::Empty);
         map.set_cell_state(9, 9, CellState::Empty);
+        map.set_cell_state(8, 9, CellState::Empty);
+        map.set_cell_state(7, 9, CellState::Empty);
+        map.set_cell_state(6, 9, CellState::Empty);
+        map.set_cell_state(5, 9, CellState::Empty);
+        map.set_cell_state(4, 9, CellState::Empty);
         let rock = Entity::new(5, 0, Rock::new(), &mut ids);
         map.entities.push(rock);
         let rock = Entity::new(5, 1, Rock::new(), &mut ids);
@@ -113,6 +119,8 @@ impl Map {
         map.entities.push(crystal);
         let exit = Entity::new(9, 9, Exit::new(), &mut ids);
         map.entities.push(exit);
+        let enemy = Entity::new(8, 9, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
+        map.entities.push(enemy);
 
         map
     }

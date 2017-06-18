@@ -55,7 +55,7 @@ pub trait EntityType {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Movement {
     NEUTRAL,
     LEFT,
