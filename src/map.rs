@@ -57,7 +57,7 @@ pub struct Map {
     pub crystals_collected: u32,
 }
 
-type Adjacent = Option<(CellState, Vec<RcEntity>)>;
+pub type Adjacent = Option<(CellState, Vec<RcEntity>)>;
 
 pub struct Adjacents {
     pub top_left: Adjacent,

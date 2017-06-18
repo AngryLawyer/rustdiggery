@@ -12,12 +12,14 @@ pub enum TurnDir {
 
 pub struct Enemy {
     turn_dir: TurnDir,
+    move_dir: Movement
 }
 
 impl Enemy {
     pub fn new(turn_dir: TurnDir) -> Box<EntityType> {
         Box::new(Enemy {
             turn_dir: turn_dir,
+            move_dir: Movement::RIGHT
         })
     }
 
@@ -53,44 +55,14 @@ impl EntityType for Enemy {
             return;
         }
         let grid = (
-            self.considered_passable(adjacents.left),
-            self.considered_passable(adjacents.top),
-            self.considered_passable(adjacents.right),
-            self.considered_passable(adjacents.bottom)
+            self.considered_passable(&adjacents.left),
+            self.considered_passable(&adjacents.top),
+            self.considered_passable(&adjacents.right),
+            self.considered_passable(&adjacents.bottom)
         );
-        match (self.turn_dir, grid) {
-            TurnDir::CLOCKWISE, (_, _, true, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::RIGHT,
-            },
-            TurnDir::CLOCKWISE, (_, _, _, true) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::DOWN,
-            },
-            TurnDir::CLOCKWISE, (true, _, _, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::LEFT,
-            },
-            TurnDir::CLOCKWISE, (_, true, _, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::UP,
-            },
-            TurnDir::ANTICLOCKWISE, (true, _, _, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::LEFT,
-            },
-            TurnDir::ANTICLOCKWISE, (_, true, _, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::UP,
-            },
-            TurnDir::ANTICLOCKWISE, (_, _, true, _) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::RIGHT,
-            },
-            TurnDir::ANTICLOCKWISE, (_, _, _, true) => {
-                state.cell_move_state = CellMoveState::EXITING,
-                state.movement = Movement::DOWN,
-            },
+        match (self.turn_dir, self.move_dir, grid) {
+            // TODO: Maze algorythm
+            _ => ()
         }
     }
 }
