@@ -81,6 +81,13 @@ pub struct EntityState {
     pub cell_move_state: CellMoveState,
 }
 
+impl EntityState {
+    pub fn set_movement(&mut self, movement: Movement) {
+        self.movement = movement;
+        self.cell_move_state = CellMoveState::EXITING;
+    }
+}
+
 pub struct Entity {
     pub state: EntityState,
     entity_type: Box<EntityType>

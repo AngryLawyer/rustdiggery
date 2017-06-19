@@ -35,6 +35,11 @@ impl Enemy {
             _ => false
         }
     }
+
+    fn set_movement(&mut self, state: &mut EntityState, movement: Movement) {
+        self.move_dir = movement;
+        state.set_movement(movement);
+    }
 }
 
 impl EntityType for Enemy {
@@ -61,7 +66,81 @@ impl EntityType for Enemy {
             self.considered_passable(&adjacents.bottom)
         );
         match (self.turn_dir, self.move_dir, grid) {
-            // TODO: Maze algorythm
+            (TurnDir::CLOCKWISE, Movement::LEFT, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::LEFT, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+            (_, Movement::LEFT, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+            (TurnDir::CLOCKWISE, Movement::LEFT, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::LEFT, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
+            (_, Movement::LEFT, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+
+            (TurnDir::CLOCKWISE, Movement::UP, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::UP, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+            (_, Movement::UP, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
+            (TurnDir::CLOCKWISE, Movement::UP, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::UP, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+            (_, Movement::UP, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+
+            (TurnDir::CLOCKWISE, Movement::RIGHT, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::RIGHT, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
+            (_, Movement::RIGHT, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+            (TurnDir::CLOCKWISE, Movement::RIGHT, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::RIGHT, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+            (_, Movement::RIGHT, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+
+            (TurnDir::CLOCKWISE, Movement::DOWN, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::DOWN, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+            (_, Movement::DOWN, (_, _, _, true)) => {
+                self.set_movement(state, Movement::DOWN);
+            },
+            (TurnDir::CLOCKWISE, Movement::DOWN, (_, _, true, _)) => {
+                self.set_movement(state, Movement::RIGHT);
+            },
+            (TurnDir::ANTICLOCKWISE, Movement::DOWN, (true, _, _, _)) => {
+                self.set_movement(state, Movement::LEFT);
+            },
+            (_, Movement::DOWN, (_, true, _, _)) => {
+                self.set_movement(state, Movement::UP);
+            },
             _ => ()
         }
     }
