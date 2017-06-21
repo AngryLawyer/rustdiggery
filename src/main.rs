@@ -12,6 +12,7 @@ pub mod crystal;
 pub mod game_data;
 pub mod exit;
 pub mod enemy;
+pub mod assets;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
@@ -38,7 +39,8 @@ fn main() {
         .build()
         .expect("Could not get Canvas");
 
-    let mut game_data = GameData;
+    let texture_creator = canvas.texture_creator();
+    let mut game_data = GameData::new(&texture_creator);
 
     let mut scene_stack = SceneStack::new();
     scene_stack.push(TitleScene::new());
