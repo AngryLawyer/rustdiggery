@@ -29,7 +29,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, GameData> {
+    pub fn new<'a>(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, GameData<'a>> {
         let mut scene = Box::new(GameScene {
             quitting: false,
             map: Map::new(50, 50),
@@ -72,7 +72,7 @@ impl GameScene {
 
 }
 
-impl Scene<Event, Canvas<Window>, GameData> for GameScene {
+impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for GameScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         self.map.render(renderer, engine_data, tick, self.camera_pos);
@@ -85,7 +85,7 @@ impl Scene<Event, Canvas<Window>, GameData> for GameScene {
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData<'a>>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {

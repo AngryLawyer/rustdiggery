@@ -13,7 +13,7 @@ pub struct TitleScene {
 }
 
 impl TitleScene {
-    pub fn new() -> BoxedScene<Event, Canvas<Window>, GameData> {
+    pub fn new<'a>() -> BoxedScene<Event, Canvas<Window>, GameData<'a>> {
         Box::new(TitleScene {
             quitting: false,
             continuing: false
@@ -21,7 +21,7 @@ impl TitleScene {
     }
 }
 
-impl Scene<Event, Canvas<Window>, GameData> for TitleScene {
+impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for TitleScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         let color = (tick % 256) as u8;
@@ -38,7 +38,7 @@ impl Scene<Event, Canvas<Window>, GameData> for TitleScene {
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData<'a>>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else if self.continuing {
