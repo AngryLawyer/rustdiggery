@@ -1,4 +1,4 @@
-use sdl2::render::{Canvas, RenderTarget};
+use sdl2::render::{Canvas, RenderTarget, Texture};
 use sdl2::rect::Rect;
 
 pub struct TransformContext {
@@ -28,6 +28,16 @@ impl TransformContext {
                 canvas.fill_rect(Some(updated))
             },
             None => canvas.fill_rect(None)
+        }
+    }
+
+    pub fn copy<R1: Into<Option<Rect>>, R2: Into<Option<Rect>>, T: RenderTarget>(&self, canvas: &mut Canvas<T>, texture: &Texture, src: R1, dst: R2) -> Result<(), String> {
+        match dst.into() {
+            Some(rect) => {
+                let updated = Rect::new(rect.x + self.x, rect.y + self.y, rect.w as u32, rect.h as u32);
+                canvas.copy(texture, src, updated)
+            },
+            None => canvas.copy(texture, src, None)
         }
     }
 }

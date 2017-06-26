@@ -3,7 +3,7 @@ use sdl2::video::WindowContext;
 use assets::Assets;
 
 pub struct GameData<'a> {
-    assets: Assets<'a>
+    pub assets: Assets<'a>
 }
 
 impl<'a> GameData<'a> {

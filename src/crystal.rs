@@ -45,16 +45,8 @@ impl EntityType for Crystal {
     }
 
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
-        renderer.set_draw_color(Color::RGB(0, 255, 255));
-        transform.fill_rect(
-            renderer,
-            Rect::new(
-                0,
-                0,
-                CELL_SIZE,
-                CELL_SIZE
-            )
-        );
+        let image = &engine_data.assets.crystal;
+        transform.copy(renderer, image, Rect::new(0, 0, CELL_SIZE, CELL_SIZE), Rect::new(0, 0, CELL_SIZE, CELL_SIZE));
     }
 
     fn score(&self) -> u32 {

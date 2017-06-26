@@ -3,7 +3,7 @@ use sdl2::video::WindowContext;
 use sdl2::image::LoadTexture;
 
 pub struct Assets<'a> {
-    crystal: Texture<'a>
+    pub crystal: Texture<'a>
 }
 
 impl<'a> Assets<'a> {
