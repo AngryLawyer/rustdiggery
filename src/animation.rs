@@ -15,6 +15,15 @@ impl AnimationSet {
     pub fn add<T: Into<String>>(&mut self, name: T, animation: Animation) {
         self.animations.insert(name.into(), animation);
     }
+
+    pub fn get_frame(&self, animation: &str, frame: usize) -> Option<(&AnimationFrame, usize)> {
+        match self.animations.get(animation) {
+            Some(frames) => {
+                frames.get(frame)
+            },
+            None => None
+        }
+    }
 }
 
 pub struct Animation {
@@ -30,6 +39,18 @@ impl Animation {
 
     pub fn add(&mut self, frame: AnimationFrame) {
         self.frames.push(frame);
+    }
+
+    pub fn get(&self, idx: usize) -> Option<(&AnimationFrame, usize)> {
+        match self.frames.get(idx) {
+            Some(frame) => {
+                if idx == self.frames.len() - 1 {
+                    Some((frame, 0))
+                } else {
+                    Some((frame, idx + 1))
+                }
+            }
+        }
     }
 }
 

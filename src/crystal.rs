@@ -12,12 +12,14 @@ use game_data::GameData;
 
 pub struct Crystal {
     momentum: bool,
+    current_frame: usize
 }
 
 impl Crystal {
     pub fn new() -> Box<EntityType> {
         Box::new(Crystal {
-            momentum: false
+            momentum: false,
+            current_frame: 0,
         })
     }
 }
