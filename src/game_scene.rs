@@ -23,8 +23,6 @@ pub struct GameScene {
     quitting: bool,
     map: Map,
     keyhandler: KeyHandler,
-    tick: u64,
-    next_think: u64,
     camera_pos: (u32, u32),
 }
 
@@ -34,8 +32,6 @@ impl GameScene {
             quitting: false,
             map: Map::new(50, 50),
             keyhandler: KeyHandler::new(),
-            tick: 0,
-            next_think: 0,
             camera_pos: (0, 0),
         });
         scene.adjust_camera_position(renderer);
@@ -52,7 +48,6 @@ impl GameScene {
 
         let (target_x, target_y) = player.get_abs_position();
         let (target_x, target_y) = (target_x as i64 + (CELL_SIZE as i64 / 2) - min_x, target_y as i64 + (CELL_SIZE as i64 / 2) - min_y);
-        //(player.x as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_x, player.y as i64 * CELL_SIZE as i64 + (CELL_SIZE as i64 / 2) - min_y);
         let (adjusted_x, adjusted_y) = (
             if target_x < 0 { 0 } else { target_x },
             if target_y < 0 { 0 } else { target_y },

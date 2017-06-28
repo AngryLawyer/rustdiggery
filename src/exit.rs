@@ -1,13 +1,9 @@
-use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
-use game_scene::GameEvent;
-use map::CellState;
-use map::{CELL_SIZE, Adjacents};
-use rock::{handle_collisions, think};
+use entity::{EntityType};
+use map::{CELL_SIZE};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
 use game_data::GameData;
 
@@ -42,7 +38,7 @@ impl EntityType for Exit {
                 CELL_SIZE,
                 CELL_SIZE
             )
-        );
+        ).expect("Failed to draw entity");
     }
 
     fn open_exit(&mut self) {

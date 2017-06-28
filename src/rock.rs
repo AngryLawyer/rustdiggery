@@ -149,7 +149,7 @@ impl EntityType for Rock {
                 CELL_SIZE,
                 CELL_SIZE
             )
-        );
+        ).expect("Could not draw entity");
     }
 
     fn push(&mut self, direction: Movement, tick: u64) {

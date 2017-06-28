@@ -1,9 +1,8 @@
-use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
+use entity::{EntityType, EntityState, RcEntity};
 use game_scene::GameEvent;
 use map::CellState;
 use map::{CELL_SIZE, Adjacents};
 use rock::{handle_collisions, think};
-use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
@@ -46,7 +45,7 @@ impl EntityType for Crystal {
 
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         let image = &engine_data.assets.crystal;
-        transform.copy(renderer, image, Rect::new(0, 0, CELL_SIZE, CELL_SIZE), Rect::new(0, 0, CELL_SIZE, CELL_SIZE));
+        transform.copy(renderer, image, Rect::new(0, 0, CELL_SIZE, CELL_SIZE), Rect::new(0, 0, CELL_SIZE, CELL_SIZE)).expect("Failed to draw entity");
     }
 
     fn score(&self) -> u32 {

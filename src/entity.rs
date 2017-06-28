@@ -4,7 +4,6 @@ use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use std::cell::RefCell;
-use std::collections::HashSet;
 use std::rc::Rc;
 use transform::TransformContext;
 use map::CellState;
@@ -51,7 +50,7 @@ pub trait EntityType {
                 CELL_SIZE,
                 CELL_SIZE
             )
-        );
+        ).expect("Failed to draw entity");
     }
 }
 
