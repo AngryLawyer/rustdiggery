@@ -13,6 +13,7 @@ pub mod game_data;
 pub mod exit;
 pub mod enemy;
 pub mod assets;
+pub mod animation;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
