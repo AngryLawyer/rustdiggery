@@ -16,13 +16,17 @@ impl AnimationSet {
         self.animations.insert(name.into(), animation);
     }
 
-    pub fn get_frame(&self, animation: &str, frame: usize) -> Option<(&AnimationFrame, usize)> {
+    pub fn get_frame(&self, animation: &str, frame: usize) -> Option<&AnimationFrame> {
         match self.animations.get(animation) {
             Some(frames) => {
                 frames.get(frame)
             },
             None => None
         }
+    }
+
+    pub fn get_animation(&self, animation: &str) -> Option<&Animation> {
+        self.animations.get(animation)
     }
 }
 
@@ -41,16 +45,12 @@ impl Animation {
         self.frames.push(frame);
     }
 
-    pub fn get(&self, idx: usize) -> Option<(&AnimationFrame, usize)> {
-        match self.frames.get(idx) {
-            Some(frame) => {
-                if idx == self.frames.len() - 1 {
-                    Some((frame, 0))
-                } else {
-                    Some((frame, idx + 1))
-                }
-            }
-        }
+    pub fn get(&self, idx: usize) -> Option<&AnimationFrame> {
+        self.frames.get(idx)
+    }
+
+    pub fn len(&self) -> usize {
+        self.frames.len()
     }
 }
 
@@ -62,6 +62,39 @@ impl AnimationFrame {
     pub fn new(source: &Rect) -> AnimationFrame {
         AnimationFrame {
             source_bounds: source.clone()
+        }
+    }
+}
+
+pub struct AnimationState {
+    // TODO: Find a nice way to make this deal in references
+    current_animation: String,
+    current_frame: usize,
+}
+
+impl AnimationState {
+    pub fn new() -> AnimationState {
+        AnimationState {
+            current_animation: "idle".to_owned(),
+            current_frame: 0,
+        }
+    }
+
+    pub fn get_frame<'a>(&self, animation: &'a AnimationSet) -> Option<&'a AnimationFrame> {
+        animation.get_frame(&self.current_animation, self.current_frame)
+    }
+
+    pub fn advance(&mut self, animation: &AnimationSet) {
+        // TODO: Currently we assume all animations just loop.
+        match animation.get_animation(&self.current_animation) {
+            Some(frames) => {
+                if self.current_frame == frames.len() - 1{
+                    self.current_frame = 0;
+                } else {
+                    self.current_frame += 1;
+                }
+            },
+            None => ()
         }
     }
 }
