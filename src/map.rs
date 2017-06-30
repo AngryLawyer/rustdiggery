@@ -165,7 +165,7 @@ impl Map {
         for entity in &self.entities {
             let mut entity = entity.borrow_mut();
             let adjacents = self.adjacents(entity.state.x, entity.state.y);
-            entity.think(event_bus, &adjacents, tick);
+            entity.think(event_bus, &adjacents, engine_data, tick);
         }
         // Handle dealing with queued events
         while let Some(event) = event_bus.next() {

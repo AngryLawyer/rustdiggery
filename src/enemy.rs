@@ -1,4 +1,5 @@
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
+use game_data::GameData;
 use game_scene::GameEvent;
 use map::{Adjacents, Adjacent, CellState};
 use sdl2_engine_helpers::event_bus::EventBus;
@@ -55,7 +56,7 @@ impl EntityType for Enemy {
         }
     }
 
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         if state.cell_move_state != CellMoveState::NEUTRAL {
             return;
         }

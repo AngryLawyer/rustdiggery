@@ -10,11 +10,12 @@ use map::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 use game_scene::GameEvent;
 use game_data::GameData;
+use animation::{AnimationState, AnimationSet};
 
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents) {
     }
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
     }
     fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
     }
@@ -78,6 +79,7 @@ pub struct EntityState {
     pub pos_fraction: f32,
     pub movement: Movement,
     pub cell_move_state: CellMoveState,
+    pub animation_state: AnimationState,
 }
 
 impl EntityState {
@@ -103,6 +105,7 @@ impl Entity {
                 movement: Movement::NEUTRAL,
                 cell_move_state: CellMoveState::NEUTRAL,
                 destroyed: false,
+                animation_state: AnimationState::new(),
                 id: *id
             },
             entity_type: entity_type
@@ -115,8 +118,8 @@ impl Entity {
         self.entity_type.render(renderer, transform, engine_data, tick);
     }
 
-    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
-        self.entity_type.think(&mut self.state, event_bus, adjacents, tick);
+    pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
+        self.entity_type.think(&mut self.state, event_bus, adjacents, engine_data, tick);
     }
 
     pub fn process(&mut self, tick: u64) {

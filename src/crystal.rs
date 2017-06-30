@@ -9,18 +9,15 @@ use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
 use game_data::GameData;
-use animation::AnimationState;
 
 pub struct Crystal {
     momentum: bool,
-    animation: AnimationState,
 }
 
 impl Crystal {
     pub fn new() -> Box<EntityType> {
         Box::new(Crystal {
             momentum: false,
-            animation: AnimationState::new(),
         })
     }
 }
@@ -30,10 +27,10 @@ impl EntityType for Crystal {
         handle_collisions(state, event_bus, cell_state, self.momentum);
     }
 
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         think(state, event_bus, adjacents, tick, &mut self.momentum);
         if tick % 60 == 0 {
-            // Pass
+            //state.animation_state.advance();
         }
     }
 

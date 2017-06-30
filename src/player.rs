@@ -1,7 +1,8 @@
-use map::{CELL_SIZE, Adjacents};
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
+use game_data::GameData;
 use game_scene::GameEvent;
 use map::CellState;
+use map::{CELL_SIZE, Adjacents};
 use sdl2_engine_helpers::event_bus::EventBus;
 
 pub struct Player {
@@ -110,7 +111,7 @@ impl EntityType for Player {
         }
     }
 
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         match (&self.pushing, &adjacents.left, &adjacents.right) {
             (&Movement::LEFT, &Some((_, ref items)), _) if items.len() > 0 => {
                 let item = items.first().unwrap();

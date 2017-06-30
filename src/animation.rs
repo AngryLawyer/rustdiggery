@@ -35,9 +35,9 @@ pub struct Animation {
 }
 
 impl Animation {
-    pub fn new() -> Animation {
+    pub fn new(frames: Vec<AnimationFrame>) -> Animation {
         Animation {
-            frames: vec![]
+            frames: frames
         }
     }
 

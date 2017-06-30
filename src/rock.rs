@@ -1,4 +1,5 @@
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
+use game_data::GameData;
 use game_scene::GameEvent;
 use map::CellState;
 use map::{CELL_SIZE, Adjacents};
@@ -8,7 +9,6 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
-use game_data::GameData;
 
 const PUSH_AMPLITUDE: u32 = 10;
 
@@ -102,7 +102,7 @@ impl EntityType for Rock {
         handle_collisions(state, event_bus, cell_state, self.momentum);
     }
 
-    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, tick: u64) {
+    fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         think(state, event_bus, adjacents, tick, &mut self.momentum);
 
         if state.pos_fraction != 0.0 {
