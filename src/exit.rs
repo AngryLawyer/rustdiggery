@@ -1,5 +1,5 @@
-use entity::{EntityType};
-use map::{CELL_SIZE};
+use entity::{EntityType, RcEntity};
+use map::{CELL_SIZE, CellState};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
@@ -7,6 +7,8 @@ use sdl2::video::Window;
 use transform::TransformContext;
 use game_data::GameData;
 use entity::EntityState;
+use game_scene::GameEvent;
+use sdl2_engine_helpers::event_bus::EventBus;
 
 pub struct Exit {
     open: bool,
@@ -48,5 +50,17 @@ impl EntityType for Exit {
 
     fn destructable(&self) -> bool {
         false
+    }
+
+    fn collisions(&self, state: &EntityState, event_bus: &mut EventBus<GameEvent>, cell_state: (CellState, Vec<RcEntity>)) {
+        match cell_state {
+            (_, ref items) if items.len() > 0 => {
+                let item = items.first().unwrap();
+                if item.borrow().is_player() {
+                    event_bus.enqueue(GameEvent::Complete);
+                }
+            },
+            _ => ()
+        }
     }
 }

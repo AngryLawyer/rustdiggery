@@ -1,19 +1,20 @@
 extern crate sdl2;
 extern crate sdl2_engine_helpers;
 
-pub mod title_scene;
-pub mod game_scene;
+pub mod animation;
+pub mod assets;
+pub mod crystal;
+pub mod enemy;
 pub mod entity;
+pub mod exit;
+pub mod game_data;
+pub mod game_scene;
+pub mod interstital_scene;
 pub mod map;
-pub mod transform;
 pub mod player;
 pub mod rock;
-pub mod crystal;
-pub mod game_data;
-pub mod exit;
-pub mod enemy;
-pub mod assets;
-pub mod animation;
+pub mod title_scene;
+pub mod transform;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;

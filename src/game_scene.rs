@@ -17,6 +17,7 @@ pub enum GameEvent {
     Explosion(u32, u32),
     Push(Movement, RcEntity),
     Collect(RcEntity),
+    Complete,
 }
 
 pub struct GameScene {

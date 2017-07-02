@@ -55,6 +55,7 @@ pub struct Map {
     pub height: u32,
     pub crystals_to_pass: u32,
     pub crystals_collected: u32,
+    pub is_complete: bool,
 }
 
 pub type Adjacent = Option<(CellState, Vec<RcEntity>)>;
@@ -96,6 +97,7 @@ impl Map {
             conflicts: HashMap::new(),
             crystals_to_pass: 1,
             crystals_collected: 0,
+            is_complete: false,
         };
 
         map.set_cell_state(5, 0, CellState::Empty);
@@ -228,8 +230,10 @@ impl Map {
                 },
                 GameEvent::Push(dir, item) => {
                     item.borrow_mut().push(dir, tick);
+                },
+                GameEvent::Complete => {
+                    self.is_complete = true
                 }
-                _ => ()
             }
         }
         // Cleanup items
@@ -237,8 +241,10 @@ impl Map {
         // Handle conflicts
         self.handle_conflicts();
         // Do actual movement
-        for entity in &self.entities {
-            entity.borrow_mut().process(tick);
+        if !self.is_complete {
+            for entity in &self.entities {
+                entity.borrow_mut().process(tick);
+            }
         }
     }
 
