@@ -41,7 +41,7 @@ pub trait EntityType {
     fn destructable(&self) -> bool {
         true
     }
-    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, state: &EntityState, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 0, 0));
         transform.fill_rect(
             renderer,
@@ -115,7 +115,7 @@ impl Entity {
     }
 
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
-        self.entity_type.render(renderer, transform, engine_data, tick);
+        self.entity_type.render(renderer, transform, &self.state, engine_data, tick);
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {

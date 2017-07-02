@@ -55,7 +55,7 @@ impl Animation {
 }
 
 pub struct AnimationFrame {
-    source_bounds: Rect
+    pub source_bounds: Rect
 }
 
 impl AnimationFrame {

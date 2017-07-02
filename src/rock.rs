@@ -139,7 +139,7 @@ impl EntityType for Rock {
         true
     }
 
-    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, state: &EntityState, engine_data: &GameData, tick: u64) {
         renderer.set_draw_color(Color::RGB(255, 255, 100));
         transform.fill_rect(
             renderer,

@@ -6,6 +6,7 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use transform::TransformContext;
 use game_data::GameData;
+use entity::EntityState;
 
 pub struct Exit {
     open: bool,
@@ -24,7 +25,7 @@ impl EntityType for Exit {
         self.open
     }
 
-    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
+    fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, state: &EntityState, engine_data: &GameData, tick: u64) {
         if self.open {
             renderer.set_draw_color(Color::RGB(255, 0, 255));
         } else {

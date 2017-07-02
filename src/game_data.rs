@@ -6,7 +6,7 @@ use animation::{AnimationSet, Animation, AnimationFrame};
 use map::{CELL_SIZE};
 
 pub struct Animations {
-    crystal: AnimationSet
+    pub crystal: AnimationSet
 }
 
 pub struct GameData<'a> {
