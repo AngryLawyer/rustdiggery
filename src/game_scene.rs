@@ -9,6 +9,7 @@ use sdl2_engine_helpers::event_bus::EventBus;
 use map::{Map, CELL_SIZE};
 use entity::{Movement, RcEntity};
 use game_data::GameData;
+use map_loader::MapData;
 
 pub enum GameEvent {
     MoveRequest(Movement),
@@ -31,7 +32,7 @@ impl GameScene {
     pub fn new<'a>(renderer: &mut Canvas<Window>) -> BoxedScene<Event, Canvas<Window>, GameData<'a>> {
         let mut scene = Box::new(GameScene {
             quitting: false,
-            map: Map::new(50, 50),
+            map: Map::new(),
             keyhandler: KeyHandler::new(),
             camera_pos: (0, 0),
         });

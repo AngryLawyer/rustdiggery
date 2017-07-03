@@ -1,5 +1,10 @@
 extern crate sdl2;
 extern crate sdl2_engine_helpers;
+extern crate serde;
+extern crate serde_json;
+
+#[macro_use]
+extern crate serde_derive;
 
 pub mod animation;
 pub mod assets;
@@ -15,6 +20,7 @@ pub mod player;
 pub mod rock;
 pub mod title_scene;
 pub mod transform;
+pub mod map_loader;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;

@@ -6,6 +6,7 @@ use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use game_scene::GameScene;
 use game_data::GameData;
+use map_loader::MapData;
 
 pub struct InterstitalScene {
     continuing: bool
@@ -38,7 +39,9 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for InterstitalScene {
     fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData<'a>>> {
         if self.continuing {
             self.continuing = false;
-            Some(SceneChangeEvent::SwapScene(Box::new(|renderer, _| { GameScene::new(renderer) })))
+            //let map: MapData = engine_data.maps[0].clone();
+            let game_scene = GameScene::new(renderer, engine_data.maps[0].clone());
+            Some(SceneChangeEvent::SwapScene(Box::new(|renderer, _| { game_scene })))
         } else {
             None
         }

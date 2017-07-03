@@ -14,6 +14,7 @@ use sdl2_engine_helpers::event_bus::EventBus;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use transform::TransformContext;
+use map_loader::MapData;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -74,7 +75,30 @@ pub struct Adjacents {
 pub const CELL_SIZE: u32 = 32;
 
 impl Map {
-    pub fn new(width: u32, height: u32) -> Map{
+    pub fn new(data: &MapData) -> Map {
+        let mut ids = 0;
+        let mut entities = vec![];
+        let mut cells = vec![CellState::Dirt; (data.width * data.height) as usize];
+        let player = Entity::new(0,1, Player::new(), &mut ids);
+        let borrow = player.clone();
+        entities.push(player);
+
+        let mut map = Map {
+            cells: cells,
+            entities: entities,
+            width: data.width,
+            height: data.height,
+            player: borrow,
+            locations: HashMap::new(),
+            conflicts: HashMap::new(),
+            crystals_to_pass: 0,
+            crystals_collected: 0,
+            is_complete: false,
+        };
+
+        map
+    }
+    /*pub fn new(width: u32, height: u32) -> Map{
         let mut ids = 0;
         let mut entities = vec![];
         let mut cells = vec![CellState::Dirt; (width * height) as usize];
@@ -127,7 +151,7 @@ impl Map {
         map.entities.push(enemy);
 
         map
-    }
+    }*/
 
     pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64, camera_pos: (u32, u32)) {
         let (camera_x, camera_y) = camera_pos;

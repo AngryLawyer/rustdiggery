@@ -4,6 +4,7 @@ use sdl2::rect::Rect;
 use assets::Assets;
 use animation::{AnimationSet, Animation, AnimationFrame};
 use map::{CELL_SIZE};
+use map_loader::{load_maps, MapData};
 
 pub struct Animations {
     pub crystal: AnimationSet
@@ -11,7 +12,8 @@ pub struct Animations {
 
 pub struct GameData<'a> {
     pub assets: Assets<'a>,
-    pub animations: Animations
+    pub animations: Animations,
+    pub maps: Vec<MapData>,
 }
 
 impl<'a> GameData<'a> {
@@ -22,11 +24,14 @@ impl<'a> GameData<'a> {
         let anim = Animation::new(vec![frame_1, frame_2]);
         crystal.add("idle", anim);
 
+        let maps = load_maps().expect("Failed to load maps");
+
         GameData {
             assets: Assets::new(texture_creator),
             animations: Animations {
                 crystal: crystal
             },
+            maps: maps,
         }
     }
 }
