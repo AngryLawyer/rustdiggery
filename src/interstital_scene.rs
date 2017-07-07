@@ -40,7 +40,7 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for InterstitalScene {
         if self.continuing {
             self.continuing = false;
             //let map: MapData = engine_data.maps[0].clone();
-            let game_scene = GameScene::new(renderer, engine_data.maps[0].clone());
+            let game_scene = GameScene::new(renderer, &(engine_data.maps[0].clone()));
             Some(SceneChangeEvent::SwapScene(Box::new(|renderer, _| { game_scene })))
         } else {
             None
