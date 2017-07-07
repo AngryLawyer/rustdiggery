@@ -7,6 +7,7 @@ use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 use game_scene::GameScene;
 use game_data::GameData;
 use interstital_scene::InterstitalScene;
+use scene::{RustdiggeryScene, BoxedRustdiggeryScene, SceneChange};
 
 pub struct TitleScene {
     quitting: bool,
@@ -14,7 +15,7 @@ pub struct TitleScene {
 }
 
 impl TitleScene {
-    pub fn new<'a>() -> BoxedScene<Event, Canvas<Window>, GameData<'a>> {
+    pub fn new<'a>() -> BoxedRustdiggeryScene<'a> {
         Box::new(TitleScene {
             quitting: false,
             continuing: false
@@ -22,7 +23,7 @@ impl TitleScene {
     }
 }
 
-impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for TitleScene {
+impl<'a> Scene<Event, Canvas<Window>, GameData<'a>, SceneChange> for TitleScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         let color = (tick % 256) as u8;
@@ -39,12 +40,12 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for TitleScene {
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData<'a>>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<SceneChange>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else if self.continuing {
             self.continuing = false;
-            Some(SceneChangeEvent::PushScene(Box::new(|renderer, _| { InterstitalScene::new() })))
+            Some(SceneChangeEvent::PushScene(SceneChange::InterstitalScene))
         } else {
             None
         }

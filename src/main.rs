@@ -21,6 +21,7 @@ pub mod rock;
 pub mod title_scene;
 pub mod transform;
 pub mod map_loader;
+pub mod scene;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
@@ -29,6 +30,7 @@ use sdl2::image::{INIT_PNG};
 
 use title_scene::TitleScene;
 use game_data::GameData;
+use scene::SceneChange;
 
 fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
@@ -70,7 +72,14 @@ fn main() {
                     }
                 }
             };
-            scene_stack.think(&mut canvas, &mut game_data, frame_number);
+            scene_stack.think(&mut canvas, &mut game_data, frame_number, |event_data, rendererer, game_data| {
+                match event_data {
+                    SceneChange::InterstitalScene => {
+                    },
+                    SceneChange::GameScene => {
+                    },
+                }
+            });
             scene_stack.render(&mut canvas, &game_data, frame_number);
             false
         }
