@@ -1,15 +1,16 @@
+use entity::{Movement, RcEntity};
+use game_data::GameData;
+use map::{Map, CELL_SIZE};
+use map_loader::MapData;
+use scene::{RustdiggeryScene, BoxedRustdiggeryScene, SceneChange};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
-use sdl2_engine_helpers::keyhandler::KeyHandler;
 use sdl2_engine_helpers::event_bus::EventBus;
-use map::{Map, CELL_SIZE};
-use entity::{Movement, RcEntity};
-use game_data::GameData;
-use map_loader::MapData;
+use sdl2_engine_helpers::keyhandler::KeyHandler;
+use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
 
 pub enum GameEvent {
     MoveRequest(Movement),
@@ -29,7 +30,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new<'a>(renderer: &mut Canvas<Window>, map_data: &MapData) -> BoxedScene<Event, Canvas<Window>, GameData<'a>> {
+    pub fn new<'a>(renderer: &mut Canvas<Window>, map_data: &MapData) -> BoxedRustdiggeryScene<'a> {
         let mut scene = Box::new(GameScene {
             quitting: false,
             map: Map::new(map_data),
@@ -69,7 +70,7 @@ impl GameScene {
 
 }
 
-impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for GameScene {
+impl<'a> Scene<Event, Canvas<Window>, GameData<'a>, SceneChange> for GameScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         self.map.render(renderer, engine_data, tick, self.camera_pos);
@@ -82,7 +83,7 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>> for GameScene {
         }
     }
 
-    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<Event, Canvas<Window>, GameData<'a>>> {
+    fn think(&mut self, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) -> Option<SceneChangeEvent<SceneChange>> {
         if self.quitting {
             Some(SceneChangeEvent::PopScene)
         } else {

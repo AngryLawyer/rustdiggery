@@ -1,13 +1,13 @@
+use game_data::GameData;
+use game_scene::GameScene;
+use interstital_scene::InterstitalScene;
+use scene::{RustdiggeryScene, BoxedRustdiggeryScene, SceneChange};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
-use game_scene::GameScene;
-use game_data::GameData;
-use interstital_scene::InterstitalScene;
-use scene::{RustdiggeryScene, BoxedRustdiggeryScene, SceneChange};
 
 pub struct TitleScene {
     quitting: bool,

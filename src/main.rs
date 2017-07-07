@@ -29,6 +29,8 @@ use sdl2::event::Event;
 use sdl2::image::{INIT_PNG};
 
 use title_scene::TitleScene;
+use interstital_scene::InterstitalScene;
+use game_scene::GameScene;
 use game_data::GameData;
 use scene::SceneChange;
 
@@ -72,11 +74,13 @@ fn main() {
                     }
                 }
             };
-            scene_stack.think(&mut canvas, &mut game_data, frame_number, |event_data, rendererer, game_data| {
-                match event_data {
+            scene_stack.think(&mut canvas, &mut game_data, frame_number, &|event_data, renderer, game_data| {
+                match *event_data {
                     SceneChange::InterstitalScene => {
+                        InterstitalScene::new()
                     },
                     SceneChange::GameScene => {
+                        GameScene::new(renderer, game_data.maps.get(0).unwrap())
                     },
                 }
             });
