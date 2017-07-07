@@ -1,23 +1,39 @@
 extern crate sdl2;
 extern crate sdl2_engine_helpers;
+extern crate serde;
+extern crate serde_json;
 
-//pub mod scene;
-//pub mod scene_manager;
-pub mod title_scene;
-pub mod game_scene;
+#[macro_use]
+extern crate serde_derive;
+
+pub mod animation;
+pub mod assets;
+pub mod crystal;
+pub mod enemy;
 pub mod entity;
-//pub mod keyhandler;
+pub mod exit;
+pub mod game_data;
+pub mod game_scene;
+pub mod interstital_scene;
 pub mod map;
+pub mod player;
+pub mod rock;
+pub mod title_scene;
+pub mod transform;
+pub mod map_loader;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
 use sdl2::event::Event;
+use sdl2::image::{INIT_PNG};
 
 use title_scene::TitleScene;
+use game_data::GameData;
 
 fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
     let video_subsystem = sdl_context.video().expect("Could not initialize video subsystem");
+    let _image_context = sdl2::image::init(INIT_PNG).expect("Could not initialize SDL_Image context");
     let window = video_subsystem.window("RustDiggery", 800, 600)
         .position_centered()
         .opengl()
@@ -30,6 +46,9 @@ fn main() {
         .present_vsync()
         .build()
         .expect("Could not get Canvas");
+
+    let texture_creator = canvas.texture_creator();
+    let mut game_data = GameData::new(&texture_creator);
 
     let mut scene_stack = SceneStack::new();
     scene_stack.push(TitleScene::new());
@@ -47,12 +66,12 @@ fn main() {
                         return true
                     },
                     _ => {
-                        scene_stack.handle_event(&event, &mut canvas, &mut (), frame_number);
+                        scene_stack.handle_event(&event, &mut canvas, &mut game_data, frame_number);
                     }
                 }
             };
-            scene_stack.think(&mut canvas, &mut (), frame_number);
-            scene_stack.render(&mut canvas, &(), frame_number);
+            scene_stack.think(&mut canvas, &mut game_data, frame_number);
+            scene_stack.render(&mut canvas, &game_data, frame_number);
             false
         }
     });
