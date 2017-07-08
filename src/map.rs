@@ -78,8 +78,60 @@ impl Map {
     pub fn new(data: &MapData) -> Map {
         let mut ids = 0;
         let mut entities = vec![];
-        let mut cells = vec![CellState::Dirt; (data.width * data.height) as usize];
-        let player = Entity::new(0,1, Player::new(), &mut ids);
+        let mut cells = vec![CellState::Empty; (data.width * data.height) as usize];
+        let mut player = None;
+
+        for (i, cell) in data.cells.chars().enumerate() {
+            let (x, y) = (i as u32 % data.width, i as u32 / data.height);
+            let cell_data = match cell {
+                '.' => {
+                    CellState::Empty
+                },
+                '\'' => {
+                    CellState::Dirt
+                },
+                '#' => {
+                    CellState::Wall
+                },
+                '+' => {
+                    CellState::Stone
+                },
+                '>' => {
+                    let exit = Entity::new(x, y, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
+                    entities.push(exit);
+                    CellState::Empty
+                },
+                '<' => {
+                    let exit = Entity::new(x, y, Enemy::new(TurnDir::ANTICLOCKWISE), &mut ids);
+                    entities.push(exit);
+                    CellState::Empty
+                },
+                'o' => {
+                    let exit = Entity::new(x, y, Rock::new(), &mut ids);
+                    entities.push(exit);
+                    CellState::Empty
+                },
+                '*' => {
+                    let exit = Entity::new(x, y, Crystal::new(), &mut ids);
+                    entities.push(exit);
+                    CellState::Empty
+                },
+                '&' => {
+                    let exit = Entity::new(x, y, Exit::new(), &mut ids);
+                    entities.push(exit);
+                    CellState::Empty
+                },
+                '@' => {
+                    player = Some(Entity::new(x, y, Player::new(), &mut ids));
+                    CellState::Empty
+                },
+                _ => {
+                    CellState::Empty
+                }
+            };
+            cells[i] = cell_data;
+        }
+        let player = player.expect("No player defined in map!");
         let borrow = player.clone();
         entities.push(player);
 

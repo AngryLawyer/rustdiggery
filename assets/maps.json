@@ -1,0 +1,13 @@
+[{
+    "name": "Introduction",
+    "width": 8,
+    "height": 8,
+    "cells": "#########@'''''##''**''##''++''##''++'*##''''**##'''**&#########",
+    "crystals_to_complete": 5
+}, {
+    "name": "Level 1",
+    "width": 16,
+    "height": 16,
+    "cells": "",
+    "crystals_to_complete": 0
+}]
