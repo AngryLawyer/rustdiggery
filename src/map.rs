@@ -81,8 +81,11 @@ impl Map {
         let mut cells = vec![CellState::Empty; (data.width * data.height) as usize];
         let mut player = None;
 
+        // Validate
+        assert!(data.width * data.height == data.cells.len() as u32);
+
         for (i, cell) in data.cells.chars().enumerate() {
-            let (x, y) = (i as u32 % data.width, i as u32 / data.height);
+            let (x, y) = (i as u32 % data.width, i as u32 / data.width);
             let cell_data = match cell {
                 '.' => {
                     CellState::Empty
@@ -97,28 +100,28 @@ impl Map {
                     CellState::Stone
                 },
                 '>' => {
-                    let exit = Entity::new(x, y, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
-                    entities.push(exit);
+                    let entity = Entity::new(x, y, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
+                    entities.push(entity);
                     CellState::Empty
                 },
                 '<' => {
-                    let exit = Entity::new(x, y, Enemy::new(TurnDir::ANTICLOCKWISE), &mut ids);
-                    entities.push(exit);
+                    let entity = Entity::new(x, y, Enemy::new(TurnDir::ANTICLOCKWISE), &mut ids);
+                    entities.push(entity);
                     CellState::Empty
                 },
                 'o' => {
-                    let exit = Entity::new(x, y, Rock::new(), &mut ids);
-                    entities.push(exit);
+                    let entity = Entity::new(x, y, Rock::new(), &mut ids);
+                    entities.push(entity);
                     CellState::Empty
                 },
                 '*' => {
-                    let exit = Entity::new(x, y, Crystal::new(), &mut ids);
-                    entities.push(exit);
+                    let entity = Entity::new(x, y, Crystal::new(), &mut ids);
+                    entities.push(entity);
                     CellState::Empty
                 },
                 '&' => {
-                    let exit = Entity::new(x, y, Exit::new(), &mut ids);
-                    entities.push(exit);
+                    let entity = Entity::new(x, y, Exit::new(), &mut ids);
+                    entities.push(entity);
                     CellState::Empty
                 },
                 '@' => {
@@ -134,7 +137,6 @@ impl Map {
         let player = player.expect("No player defined in map!");
         let borrow = player.clone();
         entities.push(player);
-
         let mut map = Map {
             cells: cells,
             entities: entities,
@@ -143,67 +145,13 @@ impl Map {
             player: borrow,
             locations: HashMap::new(),
             conflicts: HashMap::new(),
-            crystals_to_pass: 0,
+            crystals_to_pass: data.crystals_to_pass,
             crystals_collected: 0,
             is_complete: false,
         };
 
         map
     }
-    /*pub fn new(width: u32, height: u32) -> Map{
-        let mut ids = 0;
-        let mut entities = vec![];
-        let mut cells = vec![CellState::Dirt; (width * height) as usize];
-        let player = Entity::new(0,1, Player::new(), &mut ids);
-        let borrow = player.clone();
-        entities.push(player);
-        cells[1] = CellState::Empty;
-        cells[width as usize] = CellState::Empty;
-        cells[width as usize + 1] = CellState::Empty;
-        cells[width as usize + 2] = CellState::Empty;
-        cells[(width as usize * 2) + 1] = CellState::Stone;
-
-        let mut map = Map {
-            cells: cells,
-            entities: entities,
-            width: width,
-            height: height,
-            player: borrow,
-            locations: HashMap::new(),
-            conflicts: HashMap::new(),
-            crystals_to_pass: 1,
-            crystals_collected: 0,
-            is_complete: false,
-        };
-
-        map.set_cell_state(5, 0, CellState::Empty);
-        map.set_cell_state(5, 1, CellState::Empty);
-        map.set_cell_state(5, 2, CellState::Empty);
-        map.set_cell_state(5, 3, CellState::Empty);
-        map.set_cell_state(6, 1, CellState::Empty);
-        map.set_cell_state(6, 2, CellState::Empty);
-        map.set_cell_state(6, 3, CellState::Empty);
-        map.set_cell_state(9, 9, CellState::Empty);
-        map.set_cell_state(8, 9, CellState::Empty);
-        map.set_cell_state(7, 9, CellState::Empty);
-        map.set_cell_state(6, 9, CellState::Empty);
-        map.set_cell_state(5, 9, CellState::Empty);
-        map.set_cell_state(4, 9, CellState::Empty);
-        let rock = Entity::new(5, 0, Rock::new(), &mut ids);
-        map.entities.push(rock);
-        let rock = Entity::new(5, 1, Rock::new(), &mut ids);
-        map.entities.push(rock);
-        let rock = Entity::new(5, 2, Rock::new(), &mut ids);
-        map.entities.push(rock);
-        let crystal = Entity::new(5, 3, Crystal::new(), &mut ids);
-        map.entities.push(crystal);
-        let exit = Entity::new(9, 9, Exit::new(), &mut ids);
-        map.entities.push(exit);
-        let enemy = Entity::new(8, 9, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
-        map.entities.push(enemy);
-
-        map
-    }*/
 
     pub fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64, camera_pos: (u32, u32)) {
         let (camera_x, camera_y) = camera_pos;
@@ -216,10 +164,10 @@ impl Map {
         let (width, height) = renderer.logical_size();
 
         for (i, cell) in self.cells.iter().enumerate() {
-            let x = (i as u32 % self.width) * CELL_SIZE;
-            let y = (i as u32 / self.height) * CELL_SIZE;
+            let x = (i as u32 % self.width);
+            let y = (i as u32 / self.width);
             renderer.set_draw_color(cell.get_color());
-            transform.fill_rect(renderer, Rect::new(x as i32, y as i32, CELL_SIZE, CELL_SIZE)).expect("Could not draw cell");
+            transform.fill_rect(renderer, Rect::new((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE)).expect("Could not draw cell");
         };
 
         for entity in &self.entities {

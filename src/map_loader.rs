@@ -9,7 +9,7 @@ pub struct MapData {
     pub width: u32,
     pub height: u32,
     pub cells: String,
-    pub crystals_to_complete: u32,
+    pub crystals_to_pass: u32,
 }
 
 pub fn load_maps() -> Result<Vec<MapData>, Error> {
