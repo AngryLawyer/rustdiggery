@@ -1,6 +1,8 @@
 use sdl2::render::{Canvas, RenderTarget, Texture};
 use sdl2::rect::Rect;
 
+
+#[derive(Clone)]
 pub struct TransformContext {
     x: i32,
     y: i32

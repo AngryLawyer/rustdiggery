@@ -8,6 +8,7 @@ use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::scene::{BoxedScene, Scene, SceneChangeEvent};
+use transform::TransformContext;
 
 pub struct TitleScene {
     quitting: bool,
@@ -29,6 +30,7 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>, SceneChange> for TitleScene 
         let color = (tick % 256) as u8;
         renderer.set_draw_color(Color::RGB(color, color, color));
         renderer.clear();
+        engine_data.assets.font.blit_text(renderer, &TransformContext::new().transform(0, 0), "RUSTDIGGERY");
         renderer.present();
     }
 
