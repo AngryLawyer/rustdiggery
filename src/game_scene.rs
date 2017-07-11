@@ -77,7 +77,7 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>, SceneChange> for GameScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         self.map.render(renderer, engine_data, tick, self.camera_pos);
-        self.hud.render(renderer, engine_data, tick);
+        self.hud.render(renderer, &self.map, engine_data, tick);
         renderer.present();
     }
 
