@@ -1,5 +1,6 @@
 use entity::{Movement, RcEntity};
 use game_data::GameData;
+use hud::Hud;
 use map::{Map, CELL_SIZE};
 use map_loader::MapData;
 use scene::{RustdiggeryScene, BoxedRustdiggeryScene, SceneChange};
@@ -25,6 +26,7 @@ pub enum GameEvent {
 pub struct GameScene {
     quitting: bool,
     map: Map,
+    hud: Hud,
     keyhandler: KeyHandler,
     camera_pos: (u32, u32),
 }
@@ -36,6 +38,7 @@ impl GameScene {
             map: Map::new(map_data),
             keyhandler: KeyHandler::new(),
             camera_pos: (0, 0),
+            hud: Hud::new(),
         });
         scene.adjust_camera_position(renderer);
         scene
@@ -74,6 +77,8 @@ impl<'a> Scene<Event, Canvas<Window>, GameData<'a>, SceneChange> for GameScene {
 
     fn render(&self, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
         self.map.render(renderer, engine_data, tick, self.camera_pos);
+        self.hud.render(renderer, engine_data, tick);
+        renderer.present();
     }
 
     fn handle_event(&mut self, event: &Event, renderer: &mut Canvas<Window>, engine_data: &mut GameData, tick: u64) {

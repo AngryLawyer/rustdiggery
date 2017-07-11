@@ -23,6 +23,7 @@ pub mod transform;
 pub mod map_loader;
 pub mod scene;
 pub mod bitmap_font;
+pub mod hud;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;

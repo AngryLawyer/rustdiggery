@@ -176,8 +176,6 @@ impl Map {
             let transform = transform.transform(x, y);
             entity.render(renderer, &transform, engine_data, tick);
         }
-
-        renderer.present();
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
