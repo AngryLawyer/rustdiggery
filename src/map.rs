@@ -166,8 +166,7 @@ impl Map {
         for (i, cell) in self.cells.iter().enumerate() {
             let x = (i as u32 % self.width);
             let y = (i as u32 / self.width);
-            renderer.set_draw_color(cell.get_color());
-            transform.fill_rect(renderer, Rect::new((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32, CELL_SIZE, CELL_SIZE)).expect("Could not draw cell");
+            engine_data.assets.tileset.blit_sprite(renderer, 0, 0, &transform.transform((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32), None);
         };
 
         for entity in &self.entities {

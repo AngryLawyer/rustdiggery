@@ -3,15 +3,17 @@ use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator};
 use sdl2::video::WindowContext;
+use tileset::Tileset;
 
 pub struct Assets<'a> {
     pub font: Font<'a>,
-    pub crystal: Texture<'a>
+    pub crystal: Texture<'a>,
+    pub tileset: Tileset<'a>
 }
 
 impl<'a> Assets<'a> {
     pub fn new(texture_creator: &TextureCreator<WindowContext>) -> Assets {
-        let texture = texture_creator.load_texture("assets/crystal.png").expect("Could not load assets/crystal.png");
+        let crystal = texture_creator.load_texture("assets/crystal.png").expect("Could not load assets/crystal.png");
         let font_texture = texture_creator.load_texture("assets/jeromBD-metal3-CCBY3.png").expect("Could not load assets/jeromBD-metal3-CCBY3.png");
         let mut font_letters = [None; 256];
         let font_size = 32;
@@ -22,9 +24,13 @@ impl<'a> Assets<'a> {
             font_letters[target as usize] = bounds;
         }
         let font = Font::new(font_texture, font_letters);
+
+        let tileset_texture = texture_creator.load_texture("assets/dirt-tiles.png").expect("Could not load assets/dirt-tiles.png");
+        let tileset = Tileset::new(tileset_texture, 32);
         Assets {
-            font: font,
-            crystal: texture
+            font,
+            crystal,
+            tileset
         }
     }
 }
