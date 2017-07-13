@@ -17,7 +17,7 @@ use transform::TransformContext;
 use map_loader::MapData;
 use tileset::FlipContext;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum CellState {
     Empty,
     Dirt,
@@ -49,7 +49,69 @@ impl CellState {
     pub fn get_sprite(&self, adjacents: &Adjacents) -> Option<(u32, u32, FlipContext)> {
         match *self {
             CellState::Dirt => {
-                Some((8, 0, FlipContext::FlipNone))
+                let adjacent_tile_states = adjacents.as_tile_states();
+                let mut adjacent_tiles = [false; 8];
+                for i in 0..8 {
+                    adjacent_tiles[i] = match adjacent_tile_states[i] {
+                        CellState::Empty => true,
+                        _ => false
+                    }
+                };
+
+                let adjacent_tiles = (
+                    adjacent_tiles[0],
+                    adjacent_tiles[1],
+                    adjacent_tiles[2],
+                    adjacent_tiles[3],
+                    adjacent_tiles[4],
+                    adjacent_tiles[5],
+                    adjacent_tiles[6],
+                    adjacent_tiles[7],
+                );
+                match adjacent_tiles {
+                    (
+                        true,  true,  _,
+                        true,         false,
+                        _,     false, false
+                    ) => {
+                        Some((9, 0, FlipContext::FlipNone))
+                    },
+                    (
+                        _, true,  _,
+                        false,        false,
+                        false, false, false
+                    ) => {
+                        Some((14, 1, FlipContext::FlipNone))
+                    },
+                    (
+                        _,     true,  true,
+                        false,        true,
+                        false, false, _
+                    ) => {
+                        Some((9, 0, FlipContext::FlipHorizontal))
+                    },
+                    (
+                        true,  false, false,
+                        false,        false,
+                        false, false, false
+                    ) => {
+                        Some((10, 0, FlipContext::FlipNone))
+                    },
+                    (
+                        false, false, true,
+                        false,        false,
+                        false, false, false
+                    ) => {
+                        Some((10, 0, FlipContext::FlipHorizontal))
+                    },
+                    (
+                        _, _, _,
+                        _,    _,
+                        _, _, _
+                    ) => {
+                        Some((14, 2, FlipContext::FlipNone))
+                    }
+                }
             },
             CellState::Stone => Some((8, 0, FlipContext::FlipNone)),
             CellState::Wall => Some((2, 5, FlipContext::FlipNone)),
@@ -108,6 +170,19 @@ impl Adjacents {
 
     pub fn bottom_right(&self) -> &Adjacent {
         &self.cells[7]
+    }
+
+    pub fn as_tile_states(&self) -> [CellState; 8] {
+        let mut cells = [CellState::Wall; 8];
+        for i in 0..8 {
+            match self.cells[i] {
+                Some((state, _)) => {
+                    cells[i] = state
+                },
+                _ => ()
+            }
+        };
+        cells
     }
 }
 
