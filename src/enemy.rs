@@ -61,10 +61,10 @@ impl EntityType for Enemy {
             return;
         }
         let grid = (
-            self.considered_passable(&adjacents.left),
-            self.considered_passable(&adjacents.top),
-            self.considered_passable(&adjacents.right),
-            self.considered_passable(&adjacents.bottom)
+            self.considered_passable(adjacents.left()),
+            self.considered_passable(adjacents.top()),
+            self.considered_passable(adjacents.right()),
+            self.considered_passable(adjacents.bottom())
         );
         match (self.turn_dir, self.move_dir, grid) {
             (TurnDir::CLOCKWISE, Movement::LEFT, (_, true, _, _)) => {

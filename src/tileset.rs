@@ -6,6 +6,7 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 
 pub enum FlipContext {
+    FlipNone,
     FlipHorizontal,
     FlipVertical,
     FlipBoth
@@ -27,10 +28,10 @@ impl<'a> Tileset<'a> {
     pub fn blit_sprite(&self, renderer: &mut Canvas<Window>, x: u32, y: u32, transform: &TransformContext, flip_context: Option<FlipContext>) {
         let source_bounds = Rect::new((x * self.tile_size) as i32, (y * self.tile_size) as i32, self.tile_size, self.tile_size);
         let (flip_h, flip_v) = match flip_context {
-            None => (false, false),
-            Some(FlipHorizontal) => (true, false),
-            Some(FlipVertical) => (false, true),
-            Some(FlipBoth) => (true, true)
+            None | Some(FlipContext::FlipNone) => (false, false),
+            Some(FlipContext::FlipHorizontal) => (true, false),
+            Some(FlipContext::FlipVertical) => (false, true),
+            Some(FlipContext::FlipBoth) => (true, true)
         };
         transform.copy_ex(
             renderer,

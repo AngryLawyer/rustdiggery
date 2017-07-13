@@ -25,12 +25,12 @@ impl EntityType for Player {
 
         match key {
             Movement::UP => {
-                match adjacents.top {
-                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
+                match adjacents.top() {
+                    &Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::UP;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
-                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                    &Some((CellState::Empty, ref items)) if items.len() == 1 => {
                         let item = items.first().unwrap().borrow();
                         if item.is_enterable() {
                             state.movement = Movement::UP;
@@ -41,12 +41,12 @@ impl EntityType for Player {
                 }
             },
             Movement::DOWN => {
-                match adjacents.bottom {
-                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
+                match adjacents.bottom() {
+                    &Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::DOWN;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
-                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                    &Some((CellState::Empty, ref items)) if items.len() == 1 => {
                         let item = items.first().unwrap().borrow();
                         if item.is_enterable() {
                             state.movement = Movement::DOWN;
@@ -57,12 +57,12 @@ impl EntityType for Player {
                 }
             },
             Movement::LEFT => {
-                match adjacents.left {
-                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
+                match adjacents.left() {
+                    &Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::LEFT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
-                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                    &Some((CellState::Empty, ref items)) if items.len() == 1 => {
                         let item = items.first().unwrap().borrow();
                         if item.is_enterable() {
                             state.movement = Movement::LEFT;
@@ -75,12 +75,12 @@ impl EntityType for Player {
                 }
             },
             Movement::RIGHT => {
-                match adjacents.right {
-                    Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
+                match adjacents.right() {
+                    &Some((ref tile, ref items)) if tile.is_passable() && items.len() == 0 => {
                         state.movement = Movement::RIGHT;
                         state.cell_move_state = CellMoveState::EXITING;
                     },
-                    Some((CellState::Empty, ref items)) if items.len() == 1 => {
+                    &Some((CellState::Empty, ref items)) if items.len() == 1 => {
                         let item = items.first().unwrap().borrow();
                         if item.is_enterable() {
                             state.movement = Movement::RIGHT;
@@ -112,7 +112,7 @@ impl EntityType for Player {
     }
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
-        match (&self.pushing, &adjacents.left, &adjacents.right) {
+        match (&self.pushing, adjacents.left(), adjacents.right()) {
             (&Movement::LEFT, &Some((_, ref items)), _) if items.len() > 0 => {
                 let item = items.first().unwrap();
                 if item.borrow().is_hard() {

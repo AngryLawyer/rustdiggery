@@ -15,6 +15,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use transform::TransformContext;
 use map_loader::MapData;
+use tileset::FlipContext;
 
 #[derive(Clone)]
 pub enum CellState {
@@ -44,6 +45,17 @@ impl CellState {
             CellState::Empty => BLACK
         }
     }
+
+    pub fn get_sprite(&self, adjacents: &Adjacents) -> Option<(u32, u32, FlipContext)> {
+        match *self {
+            CellState::Dirt => {
+                Some((8, 0, FlipContext::FlipNone))
+            },
+            CellState::Stone => Some((8, 0, FlipContext::FlipNone)),
+            CellState::Wall => Some((2, 5, FlipContext::FlipNone)),
+            CellState::Empty => None
+        }
+    }
 }
 
 pub struct Map {
@@ -62,14 +74,41 @@ pub struct Map {
 pub type Adjacent = Option<(CellState, Vec<RcEntity>)>;
 
 pub struct Adjacents {
-    pub top_left: Adjacent,
-    pub top: Adjacent,
-    pub top_right: Adjacent,
-    pub left: Adjacent,
-    pub right: Adjacent,
-    pub bottom_left: Adjacent,
-    pub bottom: Adjacent,
-    pub bottom_right: Adjacent,
+    pub cells: [Adjacent; 8],
+}
+
+impl Adjacents {
+    pub fn top_left(&self) -> &Adjacent {
+        &self.cells[0]
+    }
+
+    pub fn top(&self) -> &Adjacent {
+        &self.cells[1]
+    }
+
+    pub fn top_right(&self) -> &Adjacent {
+        &self.cells[2]
+    }
+
+    pub fn left(&self) -> &Adjacent {
+        &self.cells[3]
+    }
+
+    pub fn right(&self) -> &Adjacent {
+        &self.cells[4]
+    }
+
+    pub fn bottom_left(&self) -> &Adjacent {
+        &self.cells[5]
+    }
+
+    pub fn bottom(&self) -> &Adjacent {
+        &self.cells[6]
+    }
+
+    pub fn bottom_right(&self) -> &Adjacent {
+        &self.cells[7]
+    }
 }
 
 pub const CELL_SIZE: u32 = 32;
@@ -164,9 +203,13 @@ impl Map {
         let (width, height) = renderer.logical_size();
 
         for (i, cell) in self.cells.iter().enumerate() {
-            let x = (i as u32 % self.width);
-            let y = (i as u32 / self.width);
-            engine_data.assets.tileset.blit_sprite(renderer, 0, 0, &transform.transform((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32), None);
+            let x = i as u32 % self.width;
+            let y = i as u32 / self.width;
+            let adjacents = self.adjacents(x, y);
+            match cell.get_sprite(&adjacents) {
+                Some((tile_x, tile_y, flip_state)) => engine_data.assets.tileset.blit_sprite(renderer, tile_x, tile_y, &transform.transform((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32), Some(flip_state)),
+                None => ()
+            }
         };
 
         for entity in &self.entities {
@@ -334,14 +377,16 @@ impl Map {
         };
 
         Adjacents {
-            top_left: top_left,
-            top: top,
-            top_right: top_right,
-            left: left,
-            right: right,
-            bottom_left: bottom_left,
-            bottom: bottom,
-            bottom_right: bottom_right
+            cells: [
+                top_left,
+                top,
+                top_right,
+                left,
+                right,
+                bottom_left,
+                bottom,
+                bottom_right,
+            ]
         }
     }
 

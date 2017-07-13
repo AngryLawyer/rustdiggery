@@ -49,11 +49,11 @@ pub fn think(state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjac
     }
 
     match (
-        &adjacents.left,
-        &adjacents.right,
-        &adjacents.bottom_left,
-        &adjacents.bottom,
-        &adjacents.bottom_right
+        adjacents.left(),
+        adjacents.right(),
+        adjacents.bottom_left(),
+        adjacents.bottom(),
+        adjacents.bottom_right()
     ) {
         (_, _, _, &Some((CellState::Empty, ref items)), _) if items.len() == 0 => {
             state.movement = Movement::DOWN;
@@ -113,7 +113,7 @@ impl EntityType for Rock {
                 if tick - 1 > push_tick {
                     true
                 } else if amplitude >= PUSH_AMPLITUDE {
-                    match (dir, &adjacents.left, &adjacents.right) {
+                    match (dir, adjacents.left(), adjacents.right()) {
                         (&Movement::LEFT, &Some((CellState::Empty, ref items)), _) if items.len() == 0 => {
                             state.movement = Movement::LEFT;
                             state.cell_move_state = CellMoveState::EXITING;
