@@ -70,39 +70,165 @@ impl CellState {
                 );
                 match adjacent_tiles {
                     (
-                        true,  true,  _,
+                        _,     true,  _,
+                        true,         true,
+                        _,     true, _
+                    ) => {
+                        Some((13, 0, FlipContext::FlipNone))  // Standalone
+                    },
+                    (
+                        _,     true,  _,
+                        true,         true,
+                        _,     false, _
+                    ) => {
+                        Some((13, 1, FlipContext::FlipNone))  // Top nub
+                    },
+                    (
+                        _,     false,  _,
+                        true,         true,
+                        _,     false, _
+                    ) => {
+                        Some((13, 2, FlipContext::FlipNone))  // Vertical bar
+                    },
+                    (
+                        _,     false,  _,
+                        true,         true,
+                        _,     true, _
+                    ) => {
+                        Some((13, 3, FlipContext::FlipNone))  // Bottom nub
+                    },
+                    (
+                        _,     true,  _,
+                        true,         false,
+                        _,     true,  _
+                    ) => {
+                        Some((9, 3, FlipContext::FlipNone))  // Left nub
+                    },
+                    (
+                        _,     true,  _,
+                        false,        false,
+                        _,     true,  _
+                    ) => {
+                        Some((15, 1, FlipContext::FlipNone))  // Horizontal bar
+                    },
+                    (
+                        _,     true,  _,
+                        false,        true,
+                        _,     true,  _
+                    ) => {
+                        Some((9, 3, FlipContext::FlipHorizontal))  // Right nub
+                    },
+                    (
+                        _,     true,  _,
                         true,         false,
                         _,     false, false
                     ) => {
-                        Some((9, 0, FlipContext::FlipNone))
+                        Some((9, 0, FlipContext::FlipNone))  // Top-left
                     },
                     (
-                        _, true,  _,
-                        false,        false,
-                        false, false, false
+                        _,     false,  false,
+                        true,         false,
+                        _,     false, false
                     ) => {
-                        Some((14, 1, FlipContext::FlipNone))
+                        Some((9, 1, FlipContext::FlipNone))  // Left
                     },
                     (
-                        _,     true,  true,
+                        _,     false, false,
+                        true,         false,
+                        _,     true , _
+                    ) => {
+                        Some((9, 2, FlipContext::FlipNone))  // Bottom-left
+                    },
+                    (
+                        _,     true,  _,
                         false,        true,
                         false, false, _
                     ) => {
-                        Some((9, 0, FlipContext::FlipHorizontal))
+                        Some((9, 0, FlipContext::FlipHorizontal))  // Top-right
+                    },
+                    (
+                        false,  false, _,
+                        false,         true,
+                        false,  false, _
+                    ) => {
+                        Some((9, 1, FlipContext::FlipHorizontal))  // Right
+                    },
+                    (
+                        false, false, _,
+                        false,        true,
+                        _,     true,  _
+                    ) => {
+                        Some((9, 2, FlipContext::FlipHorizontal))  // Bottom-right
+                    },
+                    (
+                        _, true,      _,
+                        _,            _,
+                        false, false, false
+                    ) => {
+                        Some((14, 1, FlipContext::FlipNone))  // Top
+                    },
+                    (
+                        false, false, false,
+                        _,            _,
+                        _, true,      _
+                    ) => {
+                        Some((14, 3, FlipContext::FlipNone))  // Bottom
+                    },
+                    (
+                        _,    true,   _,
+                        false,        false,
+                        false, false, true
+                    ) => {
+                        Some((11, 0, FlipContext::FlipHorizontal))  // T
+                    },
+                    (
+                        _,    true,  _,
+                        false,       false,
+                        true, false, false
+                    ) => {
+                        Some((11, 0, FlipContext::FlipNone))  // T
+                    },
+                    (
+                        true, false, false,
+                        false,       false,
+                        true, true,  false
+                    ) => {
+                        Some((11, 2, FlipContext::FlipNone))  // T
+                    },
+                    (
+                        false, false, true,
+                        false,        false,
+                        false, true,  true
+                    ) => {
+                        Some((11, 2, FlipContext::FlipHorizontal))  // T
                     },
                     (
                         true,  false, false,
                         false,        false,
                         false, false, false
                     ) => {
-                        Some((10, 0, FlipContext::FlipNone))
+                        Some((10, 0, FlipContext::FlipNone))  // Inside elbow top left
                     },
                     (
                         false, false, true,
                         false,        false,
                         false, false, false
                     ) => {
-                        Some((10, 0, FlipContext::FlipHorizontal))
+                        Some((10, 0, FlipContext::FlipHorizontal))  // Inside elbow top right
+                    },
+                    (
+                        false, false, false,
+                        false,        false,
+                        true, false, false
+                    ) => {
+                        Some((10, 2, FlipContext::FlipNone))  // Inside elbow bottom left
+                    },
+                    (
+                        false, false, false,
+                        false,        false,
+                        false, false, true
+                    ) => {
+                        Some((10, 2, FlipContext::FlipHorizontal))  // Inside elbow bottom right
                     },
                     (
                         _, _, _,
