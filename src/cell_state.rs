@@ -144,14 +144,14 @@ pub fn get_tileset_sprite(adjacents: &[bool; 8]) -> (u32, u32, FlipContext) {
         (
             true, false, false,
             false,       false,
-            true, true,  false
+            _, true,  false
         ) => {
             (3, 2, FlipContext::FlipNone)  // T
         },
         (
             false, false, true,
             false,        false,
-            false, true,  true
+            false, true,  _
         ) => {
             (3, 2, FlipContext::FlipHorizontal)  // T
         },
