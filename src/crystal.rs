@@ -1,6 +1,6 @@
 use entity::{EntityType, EntityState, RcEntity};
 use game_scene::GameEvent;
-use map::CellState;
+use cell_state::CellState;
 use map::{CELL_SIZE, Adjacents};
 use rock::{handle_collisions, think};
 use sdl2::rect::Rect;

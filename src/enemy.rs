@@ -1,7 +1,8 @@
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
 use game_data::GameData;
 use game_scene::GameEvent;
-use map::{Adjacents, Adjacent, CellState};
+use map::{Adjacents, Adjacent};
+use cell_state::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
 
 

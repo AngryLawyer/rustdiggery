@@ -26,6 +26,7 @@ pub mod scene;
 pub mod bitmap_font;
 pub mod hud;
 pub mod tileset;
+pub mod cell_state;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;

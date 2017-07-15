@@ -1,7 +1,7 @@
 use entity::{EntityType, Movement, EntityState, CellMoveState, RcEntity};
 use game_data::GameData;
 use game_scene::GameEvent;
-use map::CellState;
+use cell_state::CellState;
 use map::{CELL_SIZE, Adjacents};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;

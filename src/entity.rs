@@ -1,16 +1,16 @@
+use animation::{AnimationState, AnimationSet};
+use cell_state::CellState;
+use game_data::GameData;
+use game_scene::GameEvent;
 use map::{CELL_SIZE, Adjacents};
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use sdl2_engine_helpers::event_bus::EventBus;
 use std::cell::RefCell;
 use std::rc::Rc;
 use transform::TransformContext;
-use map::CellState;
-use sdl2_engine_helpers::event_bus::EventBus;
-use game_scene::GameEvent;
-use game_data::GameData;
-use animation::{AnimationState, AnimationSet};
 
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents) {

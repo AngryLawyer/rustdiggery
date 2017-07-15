@@ -1,5 +1,6 @@
 use entity::{EntityType, RcEntity};
-use map::{CELL_SIZE, CellState};
+use cell_state::CellState;
+use map::CELL_SIZE;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
