@@ -10,25 +10,16 @@ pub enum CellState {
     Wall
 }
 
-pub fn get_tileset_sprite(adjacents: &Adjacents) -> (u32, u32, FlipContext) {
-    let adjacent_tile_states = adjacents.as_tile_states();
-    let mut adjacent_tiles = [false; 8];
-    for i in 0..8 {
-        adjacent_tiles[i] = match adjacent_tile_states[i] {
-            CellState::Empty => true,
-            _ => false
-        }
-    };
-
+pub fn get_tileset_sprite(adjacents: &[bool; 8]) -> (u32, u32, FlipContext) {
     let adjacent_tiles = (
-        adjacent_tiles[0],
-        adjacent_tiles[1],
-        adjacent_tiles[2],
-        adjacent_tiles[3],
-        adjacent_tiles[4],
-        adjacent_tiles[5],
-        adjacent_tiles[6],
-        adjacent_tiles[7],
+        adjacents[0],
+        adjacents[1],
+        adjacents[2],
+        adjacents[3],
+        adjacents[4],
+        adjacents[5],
+        adjacents[6],
+        adjacents[7],
     );
     match adjacent_tiles {
         (
@@ -36,168 +27,168 @@ pub fn get_tileset_sprite(adjacents: &Adjacents) -> (u32, u32, FlipContext) {
             true,         true,
             _,     true, _
         ) => {
-            (4, 0, FlipContext::FlipNone)  // Standalone
+            (5, 0, FlipContext::FlipNone)  // Standalone
         },
         (
             _,     true,  _,
             true,         true,
             _,     false, _
         ) => {
-            (4, 1, FlipContext::FlipNone)  // Top nub
+            (5, 1, FlipContext::FlipNone)  // Top nub
         },
         (
             _,     false,  _,
             true,         true,
             _,     false, _
         ) => {
-            (4, 2, FlipContext::FlipNone)  // Vertical bar
+            (5, 2, FlipContext::FlipNone)  // Vertical bar
         },
         (
             _,     false,  _,
             true,         true,
             _,     true, _
         ) => {
-            (4, 3, FlipContext::FlipNone)  // Bottom nub
+            (5, 3, FlipContext::FlipNone)  // Bottom nub
         },
         (
             _,     true,  _,
             true,         false,
             _,     true,  _
         ) => {
-            (0, 3, FlipContext::FlipNone)  // Left nub
+            (1, 3, FlipContext::FlipNone)  // Left nub
         },
         (
             _,     true,  _,
             false,        false,
             _,     true,  _
         ) => {
-            (6, 1, FlipContext::FlipNone)  // Horizontal bar
+            (7, 1, FlipContext::FlipNone)  // Horizontal bar
         },
         (
             _,     true,  _,
             false,        true,
             _,     true,  _
         ) => {
-            (0, 3, FlipContext::FlipHorizontal)  // Right nub
+            (1, 3, FlipContext::FlipHorizontal)  // Right nub
         },
         (
             _,     true,  _,
             true,         false,
             _,     false, false
         ) => {
-            (0, 0, FlipContext::FlipNone)  // Top-left
+            (1, 0, FlipContext::FlipNone)  // Top-left
         },
         (
             _,     false,  false,
             true,         false,
             _,     false, false
         ) => {
-            (0, 1, FlipContext::FlipNone)  // Left
+            (1, 1, FlipContext::FlipNone)  // Left
         },
         (
             _,     false, false,
             true,         false,
             _,     true , _
         ) => {
-            (0, 2, FlipContext::FlipNone)  // Bottom-left
+            (1, 2, FlipContext::FlipNone)  // Bottom-left
         },
         (
             _,     true,  _,
             false,        true,
             false, false, _
         ) => {
-            (0, 0, FlipContext::FlipHorizontal)  // Top-right
+            (1, 0, FlipContext::FlipHorizontal)  // Top-right
         },
         (
             false,  false, _,
             false,         true,
             false,  false, _
         ) => {
-            (0, 1, FlipContext::FlipHorizontal)  // Right
+            (1, 1, FlipContext::FlipHorizontal)  // Right
         },
         (
             false, false, _,
             false,        true,
             _,     true,  _
         ) => {
-            (0, 2, FlipContext::FlipHorizontal)  // Bottom-right
+            (1, 2, FlipContext::FlipHorizontal)  // Bottom-right
         },
         (
             _, true,      _,
             _,            _,
             false, false, false
         ) => {
-            (5, 1, FlipContext::FlipNone)  // Top
+            (6, 1, FlipContext::FlipNone)  // Top
         },
         (
             false, false, false,
             _,            _,
             _, true,      _
         ) => {
-            (5, 3, FlipContext::FlipNone)  // Bottom
+            (6, 3, FlipContext::FlipNone)  // Bottom
         },
         (
             _,    true,   _,
             false,        false,
             false, false, true
         ) => {
-            (2, 0, FlipContext::FlipHorizontal)  // T
+            (3, 0, FlipContext::FlipHorizontal)  // T
         },
         (
             _,    true,  _,
             false,       false,
             true, false, false
         ) => {
-            (2, 0, FlipContext::FlipNone)  // T
+            (3, 0, FlipContext::FlipNone)  // T
         },
         (
             true, false, false,
             false,       false,
             true, true,  false
         ) => {
-            (2, 2, FlipContext::FlipNone)  // T
+            (3, 2, FlipContext::FlipNone)  // T
         },
         (
             false, false, true,
             false,        false,
             false, true,  true
         ) => {
-            (2, 2, FlipContext::FlipHorizontal)  // T
+            (3, 2, FlipContext::FlipHorizontal)  // T
         },
         (
             true,  false, false,
             false,        false,
             false, false, false
         ) => {
-            (1, 0, FlipContext::FlipNone)  // Inside elbow top left
+            (2, 0, FlipContext::FlipNone)  // Inside elbow top left
         },
         (
             false, false, true,
             false,        false,
             false, false, false
         ) => {
-            (1, 0, FlipContext::FlipHorizontal)  // Inside elbow top right
+            (2, 0, FlipContext::FlipHorizontal)  // Inside elbow top right
         },
         (
             false, false, false,
             false,        false,
             true, false, false
         ) => {
-            (1, 2, FlipContext::FlipNone)  // Inside elbow bottom left
+            (2, 2, FlipContext::FlipNone)  // Inside elbow bottom left
         },
         (
             false, false, false,
             false,        false,
             false, false, true
         ) => {
-            (1, 2, FlipContext::FlipHorizontal)  // Inside elbow bottom right
+            (2, 2, FlipContext::FlipHorizontal)  // Inside elbow bottom right
         },
         (
             _, _, _,
             _,    _,
             _, _, _
         ) => {
-            (5, 2, FlipContext::FlipNone)
+            (6, 2, FlipContext::FlipNone)
         }
     }
 }
@@ -226,10 +217,29 @@ impl CellState {
     pub fn get_sprite(&self, adjacents: &Adjacents) -> Option<(u32, u32, FlipContext)> {
         match *self {
             CellState::Dirt => {
-                let (x, y, context) = get_tileset_sprite(adjacents);
-                Some((x + 9, y, context))
+                let adjacent_tile_states = adjacents.as_tile_states();
+                let mut adjacent_tiles = [false; 8];
+                for i in 0..8 {
+                    adjacent_tiles[i] = match adjacent_tile_states[i] {
+                        CellState::Empty => true,
+                        _ => false
+                    }
+                };
+                let (x, y, context) = get_tileset_sprite(&adjacent_tiles);
+                Some((x + 8, y, context))
             },
-            CellState::Stone => Some((8, 0, FlipContext::FlipNone)),
+            CellState::Stone => {
+                let adjacent_tile_states = adjacents.as_tile_states();
+                let mut adjacent_tiles = [false; 8];
+                for i in 0..8 {
+                    adjacent_tiles[i] = match adjacent_tile_states[i] {
+                        CellState::Empty | CellState::Dirt => true,
+                        _ => false
+                    }
+                };
+                let (x, y, context) = get_tileset_sprite(&adjacent_tiles);
+                Some((x + 8, y + 12, context))
+            },
             CellState::Wall => Some((2, 5, FlipContext::FlipNone)),
             CellState::Empty => None
         }
