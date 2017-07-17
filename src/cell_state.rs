@@ -184,6 +184,104 @@ pub fn get_tileset_sprite(adjacents: &[bool; 8]) -> (u32, u32, FlipContext) {
             (2, 2, FlipContext::FlipHorizontal)  // Inside elbow bottom right
         },
         (
+            false, false, true,
+            false,        false,
+            true, false, false
+        ) => {
+            (3, 1, FlipContext::FlipNone)  // Diagonal
+        },
+        (
+            true,  false, false,
+            false,        false,
+            false, false, true,
+        ) => {
+            (3, 1, FlipContext::FlipHorizontal)  // Diagonal
+        },
+        (
+            false, false, _,
+            false,        true,
+            true, false, _
+        ) => {
+            (4, 2, FlipContext::FlipNone)  // Side missing bottom corner
+        },
+        (
+            _,    false, false,
+            true,        false,
+            _,    false, true
+        ) => {
+            (4, 2, FlipContext::FlipHorizontal)  // Side missing bottom corner
+        },
+        (
+            true, false, _,
+            false,        true,
+            false, false, _
+        ) => {
+            (4, 0, FlipContext::FlipNone)  // Side missing top corner
+        },
+        (
+            _,    false,  true,
+            true,        false,
+            _,    false, false,
+        ) => {
+            (4, 0, FlipContext::FlipHorizontal)  // Side missing top corner
+        },
+        (
+            _,     true,  _,
+            false,        false,
+            true,  false, true,
+        ) => {
+            (6, 0, FlipContext::FlipNone)  // T
+        },
+        (
+            true,  false, true,
+            false,        false,
+            _,     true,  _
+        ) => {
+            (7, 0, FlipContext::FlipNone)  // Inverse T
+        },
+        (
+            true,  false, true,
+            false,        false,
+            _,     false, _
+        ) => {
+            (4, 3, FlipContext::FlipNone)  // T
+        },
+        (
+            _,     false, _,
+            false,        false,
+            true,  false, true
+        ) => {
+            (4, 3, FlipContext::FlipVertical)  // T
+        },
+        (
+            _,     true,  _,
+            true,         false,
+            _,     false, true
+        ) => {
+            (2, 3, FlipContext::FlipNone)  // Top-left bend
+        },
+        (
+            _,      true,  _,
+            false,         true,
+            true,    false, _
+        ) => {
+            (2, 3, FlipContext::FlipHorizontal)  // Top-right bend
+        },
+        (
+            _,     false, true,
+            true,         false,
+            _,     true , _
+        ) => {
+            (3, 3, FlipContext::FlipNone)  // Bottom-left
+        },
+        (
+            true,  false, _,
+            false,        true,
+            _,      true , _
+        ) => {
+            (3, 3, FlipContext::FlipHorizontal)  // Bottom-left
+        },
+        (
             _, _, _,
             _,    _,
             _, _, _
