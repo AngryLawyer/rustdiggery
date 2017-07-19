@@ -410,7 +410,7 @@ impl CellState {
                 Some((x + 8, y + 12, context))
             },
             CellState::Wall => {
-                Some((2, 5, FlipContext::FlipNone)),
+                Some((2, 5, FlipContext::FlipNone))
             },
             CellState::Empty => None
         }

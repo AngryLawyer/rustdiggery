@@ -54,6 +54,7 @@ impl Animation {
     }
 }
 
+#[derive(Clone)]
 pub struct AnimationFrame {
     pub source_bounds: Rect
 }
@@ -96,5 +97,9 @@ impl AnimationState {
             },
             None => ()
         }
+    }
+
+    pub fn set_animation(&mut self, animation: &str) {
+        self.current_animation = animation.to_owned();
     }
 }

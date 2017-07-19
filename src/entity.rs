@@ -36,7 +36,7 @@ pub trait EntityType {
     fn score(&self) -> u32 {
         0
     }
-    fn open_exit(&mut self) {
+    fn open_exit(&mut self, state: &mut EntityState) {
     }
     fn destructable(&self) -> bool {
         true
@@ -230,7 +230,7 @@ impl Entity {
     }
 
     pub fn open_exit(&mut self) {
-        self.entity_type.open_exit()
+        self.entity_type.open_exit(&mut self.state)
     }
 
     pub fn destructable(&self) -> bool {
