@@ -10,7 +10,7 @@ pub enum CellState {
     Wall
 }
 
-pub fn get_tileset_sprite(adjacents: &[bool; 8]) -> (u32, u32, FlipContext) {
+pub fn get_tileset_sprite(adjacents: &[bool; 8], alternate: bool) -> (u32, u32, FlipContext) {
     let adjacent_tiles = (
         adjacents[0],
         adjacents[1],
@@ -347,12 +347,17 @@ pub fn get_tileset_sprite(adjacents: &[bool; 8]) -> (u32, u32, FlipContext) {
         ) => {
             (7, 2, FlipContext::FlipNone)  // +
         },
+        // 7, 3 skipped as alternate art
         (
             _, _, _,
             _,    _,
             _, _, _
         ) => {
-            (6, 2, FlipContext::FlipNone)
+            if alternate {
+                (7, 3, FlipContext::FlipNone)
+            } else {
+                (6, 2, FlipContext::FlipNone)
+            }
         }
     }
 }
@@ -378,7 +383,7 @@ impl CellState {
         }
     }
 
-    pub fn get_sprite(&self, adjacents: &Adjacents) -> Option<(u32, u32, FlipContext)> {
+    pub fn get_sprite(&self, adjacents: &Adjacents, alternate: bool) -> Option<(u32, u32, FlipContext)> {
         match *self {
             CellState::Dirt => {
                 let adjacent_tile_states = adjacents.as_tile_states();
@@ -389,7 +394,7 @@ impl CellState {
                         _ => false
                     }
                 };
-                let (x, y, context) = get_tileset_sprite(&adjacent_tiles);
+                let (x, y, context) = get_tileset_sprite(&adjacent_tiles, alternate);
                 Some((x + 8, y, context))
             },
             CellState::Stone => {
@@ -401,10 +406,12 @@ impl CellState {
                         _ => false
                     }
                 };
-                let (x, y, context) = get_tileset_sprite(&adjacent_tiles);
+                let (x, y, context) = get_tileset_sprite(&adjacent_tiles, alternate);
                 Some((x + 8, y + 12, context))
             },
-            CellState::Wall => Some((2, 5, FlipContext::FlipNone)),
+            CellState::Wall => {
+                Some((2, 5, FlipContext::FlipNone)),
+            },
             CellState::Empty => None
         }
     }
