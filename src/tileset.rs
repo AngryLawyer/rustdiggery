@@ -13,12 +13,12 @@ pub enum FlipContext {
 }
 
 pub struct Tileset<'a> {
-    texture: Texture<'a>,
+    texture: &'a Texture<'a>,
     tile_size: u32
 }
 
 impl<'a> Tileset<'a> {
-    pub fn new(texture: Texture<'a>, tile_size: u32) -> Tileset<'a> {
+    pub fn new(texture: &'a Texture<'a>, tile_size: u32) -> Tileset<'a> {
         Tileset {
             texture,
             tile_size

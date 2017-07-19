@@ -3,13 +3,11 @@ use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::render::{Texture, TextureCreator};
 use sdl2::video::WindowContext;
-use tileset::Tileset;
 
 pub struct Assets<'a> {
     pub font: Font<'a>,
     pub crystal: Texture<'a>,
     pub tileset_raw: Texture<'a>,
-    pub tileset: Tileset<'a>
 }
 
 impl<'a> Assets<'a> {
@@ -31,14 +29,11 @@ impl<'a> Assets<'a> {
         let font_texture = texture_creator.load_texture("assets/jeromBD-metal3-CCBY3.png").expect("Could not load assets/jeromBD-metal3-CCBY3.png");
         let font = Assets::load_font(font_texture);
 
-        let tileset_texture = texture_creator.load_texture("assets/dirt-tiles.png").expect("Could not load assets/dirt-tiles.png");
-        let tileset_raw = texture_creator.load_texture("assets/dirt-tiles.png").expect("Could not load assets/dirt-tiles.png");  // FIXME: Unify
-        let tileset = Tileset::new(tileset_texture, 32);
+        let tileset_raw = texture_creator.load_texture("assets/dirt-tiles.png").expect("Could not load assets/dirt-tiles.png");
         Assets {
             font,
             crystal,
-            tileset,
-            tileset_raw
+            tileset_raw,
         }
     }
 }

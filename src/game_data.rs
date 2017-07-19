@@ -5,6 +5,7 @@ use assets::Assets;
 use animation::{AnimationSet, Animation, AnimationFrame};
 use map::{CELL_SIZE};
 use map_loader::{load_maps, MapData};
+use tileset::Tileset;
 
 pub struct Animations {
     pub crystal: AnimationSet,
@@ -12,9 +13,10 @@ pub struct Animations {
 }
 
 pub struct GameData<'a> {
-    pub assets: Assets<'a>,
+    pub assets: &'a Assets<'a>,
     pub animations: Animations,
     pub maps: Vec<MapData>,
+    pub tileset: Tileset<'a>,
 }
 
 impl<'a> GameData<'a> {
@@ -40,19 +42,22 @@ impl<'a> GameData<'a> {
         exit
     }
 
-    pub fn new(texture_creator: &TextureCreator<WindowContext>) -> GameData {
+    pub fn new(assets: &'a Assets) -> GameData<'a> {
         let crystal = GameData::crystal_animation();
         let exit = GameData::exit_animation();
 
         let maps = load_maps().expect("Failed to load maps");
 
+        let tileset = Tileset::new(&assets.tileset_raw, 32);
+
         GameData {
-            assets: Assets::new(texture_creator),
+            assets,
             animations: Animations {
                 crystal: crystal,
                 exit: exit
             },
             maps: maps,
+            tileset,
         }
     }
 }

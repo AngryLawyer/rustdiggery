@@ -38,6 +38,7 @@ use interstital_scene::InterstitalScene;
 use game_scene::GameScene;
 use game_data::GameData;
 use scene::SceneChange;
+use assets::Assets;
 
 fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
@@ -57,7 +58,8 @@ fn main() {
         .expect("Could not get Canvas");
 
     let texture_creator = canvas.texture_creator();
-    let mut game_data = GameData::new(&texture_creator);
+    let assets = Assets::new(&texture_creator);
+    let mut game_data = GameData::new(&assets);
 
     let mut scene_stack = SceneStack::new();
     scene_stack.push(TitleScene::new());

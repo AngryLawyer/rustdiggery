@@ -179,7 +179,7 @@ impl Map {
             let y = i as u32 / self.width;
             let adjacents = self.adjacents(x, y);
             match cell.get_sprite(&adjacents, i % 23 == 0) {
-                Some((tile_x, tile_y, flip_state)) => engine_data.assets.tileset.blit_sprite(renderer, tile_x, tile_y, &transform.transform((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32), Some(flip_state)),
+                Some((tile_x, tile_y, flip_state)) => engine_data.tileset.blit_sprite(renderer, tile_x, tile_y, &transform.transform((x * CELL_SIZE) as i32, (y * CELL_SIZE) as i32), Some(flip_state)),
                 None => ()
             }
         };
