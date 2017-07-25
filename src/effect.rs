@@ -25,7 +25,7 @@ impl Effect {
         }
     }
 
-    pub fn think(&mut self, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
+    pub fn think(&mut self, engine_data: &GameData, tick: u64) {
         if tick % 5 == 0 {
             self.animation_state.advance(&engine_data.animations.explosion);  // TODO: Decouple
         }
@@ -37,6 +37,6 @@ impl Effect {
     pub fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, engine_data: &GameData, tick: u64) {
         let image = &engine_data.assets.explosion;
         let source = self.animation_state.get_frame(&engine_data.animations.explosion).expect("Could not get animation frame");
-        transform.copy(renderer, image, source.source_bounds, Rect::new(self.x as i32, self.y as i32, CELL_SIZE, CELL_SIZE)).expect("Failed to draw entity");
+        transform.copy(renderer, image, source.source_bounds, Rect::new(0, 0, CELL_SIZE, CELL_SIZE)).expect("Failed to draw entity");
     }
 }

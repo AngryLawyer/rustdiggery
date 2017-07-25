@@ -193,6 +193,12 @@ impl Map {
             let transform = transform.transform(x, y);
             entity.render(renderer, &transform, engine_data, tick);
         }
+
+        for effect in &self.effects {
+            let (x, y) = (effect.x, effect.y);
+            let transform = transform.transform(x as i32, y as i32);
+            effect.render(renderer, &transform, engine_data, tick);
+        }
     }
 
     pub fn think(&mut self, event_bus: &mut EventBus<GameEvent>, renderer: &mut Canvas<Window>, engine_data: &GameData, tick: u64) {
@@ -284,6 +290,9 @@ impl Map {
             for entity in &self.entities {
                 entity.borrow_mut().process(tick);
             }
+        }
+        for effect in &mut self.effects {
+            effect.think(engine_data, tick);
         }
     }
 
