@@ -8,6 +8,7 @@ pub struct Assets<'a> {
     pub font: Font<'a>,
     pub crystal: Texture<'a>,
     pub tileset_raw: Texture<'a>,
+    pub explosion: Texture<'a>,
 }
 
 impl<'a> Assets<'a> {
@@ -30,7 +31,10 @@ impl<'a> Assets<'a> {
         let font = Assets::load_font(font_texture);
 
         let tileset_raw = texture_creator.load_texture("assets/dirt-tiles.png").expect("Could not load assets/dirt-tiles.png");
+        let explosion = texture_creator.load_texture("assets/M484ExplosionSet1.png").expect("Could not load assets/M484ExplosionSet1.png");
+
         Assets {
+            explosion,
             font,
             crystal,
             tileset_raw,

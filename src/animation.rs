@@ -89,7 +89,7 @@ impl AnimationState {
         // TODO: Currently we assume all animations just loop.
         match animation.get_animation(&self.current_animation) {
             Some(frames) => {
-                if self.current_frame == frames.len() - 1{
+                if self.current_frame == frames.len() - 1 {
                     self.current_frame = 0;
                 } else {
                     self.current_frame += 1;
@@ -101,5 +101,14 @@ impl AnimationState {
 
     pub fn set_animation(&mut self, animation: &str) {
         self.current_animation = animation.to_owned();
+    }
+
+    pub fn is_last_frame(&self, animation: &AnimationSet) -> bool {
+        match animation.get_animation(&self.current_animation) {
+            Some(frames) => {
+                self.current_frame == frames.len()
+            },
+            None => true
+        }
     }
 }

@@ -1,5 +1,6 @@
 use cell_state::CellState;
 use crystal::Crystal;
+use effect::Effect;
 use enemy::{TurnDir, Enemy};
 use entity::{Entity, RcEntity};
 use exit::Exit;
@@ -20,6 +21,7 @@ use transform::TransformContext;
 pub struct Map {
     cells: Vec<CellState>,
     entities: Vec<RcEntity>,
+    effects: Vec<Effect>,
     locations: HashMap<(u32, u32), Vec<RcEntity>>,
     conflicts: HashMap<(u32, u32), Vec<RcEntity>>,
     pub player: RcEntity,
@@ -151,6 +153,7 @@ impl Map {
         let mut map = Map {
             cells: cells,
             entities: entities,
+            effects: vec![],
             width: data.width,
             height: data.height,
             player: borrow,

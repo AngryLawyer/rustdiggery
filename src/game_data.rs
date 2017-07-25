@@ -9,7 +9,8 @@ use tileset::Tileset;
 
 pub struct Animations {
     pub crystal: AnimationSet,
-    pub exit: AnimationSet
+    pub exit: AnimationSet,
+    pub explosion: AnimationSet,
 }
 
 pub struct GameData<'a> {
@@ -42,6 +43,19 @@ impl<'a> GameData<'a> {
         exit
     }
 
+    fn explosion_animation() -> AnimationSet {
+        let mut explosion = AnimationSet::new();
+        let frame_1 = AnimationFrame::new(&Rect::new(92, 10, CELL_SIZE, CELL_SIZE));
+        let frame_2 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 1), 10, CELL_SIZE, CELL_SIZE));
+        let frame_3 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 2), 10, CELL_SIZE, CELL_SIZE));
+        let frame_4 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 3), 10, CELL_SIZE, CELL_SIZE));
+        let frame_5 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 4), 10, CELL_SIZE, CELL_SIZE));
+        let frame_6 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 5), 10, CELL_SIZE, CELL_SIZE));
+        let frame_7 = AnimationFrame::new(&Rect::new(92 + (CELL_SIZE as i32 * 6), 10, CELL_SIZE, CELL_SIZE));
+        explosion.add("idle", Animation::new(vec![frame_1, frame_2, frame_3, frame_4, frame_5, frame_6, frame_7]));
+        explosion
+    }
+
     pub fn new(assets: &'a Assets) -> GameData<'a> {
         let crystal = GameData::crystal_animation();
         let exit = GameData::exit_animation();
@@ -54,7 +68,8 @@ impl<'a> GameData<'a> {
             assets,
             animations: Animations {
                 crystal: crystal,
-                exit: exit
+                exit: exit,
+                explosion: GameData::explosion_animation(),
             },
             maps: maps,
             tileset,
