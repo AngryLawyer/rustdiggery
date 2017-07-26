@@ -7,6 +7,7 @@ use sdl2::video::Window;
 use transform::TransformContext;
 
 
+#[derive(Clone)]
 pub struct Effect {
     pub x: u32,
     pub y: u32,

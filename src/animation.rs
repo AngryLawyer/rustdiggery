@@ -67,6 +67,7 @@ impl AnimationFrame {
     }
 }
 
+#[derive(Clone)]
 pub struct AnimationState {
     // TODO: Find a nice way to make this deal in references
     current_animation: String,
@@ -106,7 +107,7 @@ impl AnimationState {
     pub fn is_last_frame(&self, animation: &AnimationSet) -> bool {
         match animation.get_animation(&self.current_animation) {
             Some(frames) => {
-                self.current_frame == frames.len()
+                self.current_frame == frames.len() - 1
             },
             None => true
         }

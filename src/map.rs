@@ -195,7 +195,7 @@ impl Map {
         }
 
         for effect in &self.effects {
-            let (x, y) = (effect.x, effect.y);
+            let (x, y) = (effect.x * CELL_SIZE, effect.y * CELL_SIZE);
             let transform = transform.transform(x as i32, y as i32);
             effect.render(renderer, &transform, engine_data, tick);
         }
@@ -263,8 +263,11 @@ impl Map {
                         let (x, y) = (x as u32, y as u32);
                         let (state, items) = self.at_pos(x, y, None);
                         match state {
-                            CellState::Wall => {},
-                            _ => self.set_cell_state(x, y, CellState::Empty)
+                            CellState::Wall => (),
+                            _ => {
+                                self.set_cell_state(x, y, CellState::Empty);
+                                self.effects.push(Effect::new(x, y))
+                            }
                         };
                         for item in items {
                             if item.borrow().destructable() {
@@ -453,6 +456,9 @@ impl Map {
             } else {
                 Some(entity.clone())
             }
-        }).collect::<Vec<RcEntity>>()
+        }).collect::<Vec<RcEntity>>();
+        self.effects = self.effects.iter().cloned().filter(|effect| {
+            !effect.done
+        }).collect::<Vec<_>>();
     }
 }
