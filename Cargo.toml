@@ -7,7 +7,7 @@ authors = ["Tony Aldridge <tony@angry-lawyer.com>"]
 [dependencies.sdl2]
 version = "0.30"
 default-features = false
-features = ["image"]
+features = ["image", "mixer"]
 
 # [dependencies.sdl2-engine-helpers]
 # path = "/home/tony/Projects/rust-sdl2-engine-helpers"

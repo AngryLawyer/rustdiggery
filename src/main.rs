@@ -33,6 +33,7 @@ use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
 use sdl2::event::Event;
 use sdl2::image::{INIT_PNG};
+use sdl2::mixer::{DEFAULT_CHANNELS, AUDIO_S16LSB};
 
 use title_scene::TitleScene;
 use interstital_scene::InterstitalScene;
@@ -45,6 +46,19 @@ fn main() {
     let sdl_context = sdl2::init().expect("Could not initialize SDL context");
     let video_subsystem = sdl_context.video().expect("Could not initialize video subsystem");
     let _image_context = sdl2::image::init(INIT_PNG).expect("Could not initialize SDL_Image context");
+    let _audio = sdl_context.audio().expect("Could not initialize SDL Audio");
+    // We are not using sublibraries so we don't need to initialize
+    // let _mixer_context = sdl2::mixer::init(sdl2::mixer::InitFlag::empty()).expect("Could not initialize Mixer");
+    let frequency = 44100;
+    let format = AUDIO_S16LSB; // signed 16 bit samples, in little-endian byte order
+    let channels = DEFAULT_CHANNELS; // Stereo
+    let chunk_size = 1024;
+    sdl2::mixer::open_audio(frequency, format, channels, chunk_size).expect("Failed to open Audio");
+    sdl2::mixer::allocate_channels(4);
+
+    let sound_chunk = sdl2::mixer::Chunk::from_file("./assets/explosion.wav").expect("Failed to load example sound");
+    sdl2::mixer::Channel::all().play(&sound_chunk, 0).expect("Failed to play sound");
+
     let window = video_subsystem.window("RustDiggery", 800, 600)
         .position_centered()
         .opengl()
