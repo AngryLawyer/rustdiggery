@@ -2,6 +2,7 @@ use sdl2::render::TextureCreator;
 use sdl2::video::WindowContext;
 use sdl2::rect::Rect;
 use assets::Assets;
+use audio::Audio;
 use animation::{AnimationSet, Animation, AnimationFrame};
 use map::{CELL_SIZE};
 use map_loader::{load_maps, MapData};
@@ -18,6 +19,7 @@ pub struct GameData<'a> {
     pub animations: Animations,
     pub maps: Vec<MapData>,
     pub tileset: Tileset<'a>,
+    pub audio: Audio,
 }
 
 impl<'a> GameData<'a> {
@@ -56,6 +58,16 @@ impl<'a> GameData<'a> {
         explosion
     }
 
+    fn load_audio() -> Audio {
+        let mut audio = Audio::new();
+        audio.load_sounds(&[
+            "assets/crystal.wav",
+            "assets/dig.wav",
+            "assets/explosion.wav",
+        ]);
+        audio
+    }
+
     pub fn new(assets: &'a Assets) -> GameData<'a> {
         let crystal = GameData::crystal_animation();
         let exit = GameData::exit_animation();
@@ -66,6 +78,7 @@ impl<'a> GameData<'a> {
 
         GameData {
             assets,
+            audio: GameData::load_audio(),
             animations: Animations {
                 crystal: crystal,
                 exit: exit,

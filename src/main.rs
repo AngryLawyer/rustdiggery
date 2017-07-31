@@ -28,12 +28,12 @@ pub mod hud;
 pub mod tileset;
 pub mod cell_state;
 pub mod effect;
+pub mod audio;
 
 use sdl2_engine_helpers::game_loop::GameLoop;
 use sdl2_engine_helpers::scene::SceneStack;
 use sdl2::event::Event;
 use sdl2::image::{INIT_PNG};
-use sdl2::mixer::{DEFAULT_CHANNELS, AUDIO_S16LSB};
 
 use title_scene::TitleScene;
 use interstital_scene::InterstitalScene;

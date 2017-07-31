@@ -224,6 +224,7 @@ impl Map {
                 },
                 GameEvent::Dig(x, y) => {
                     self.set_cell_state(x, y, CellState::Empty);
+                    engine_data.audio.play_sound("assets/dig.wav");
                 },
                 GameEvent::Crushed(item) => {
                     let (x, y) = {
@@ -242,6 +243,7 @@ impl Map {
                             entity.open_exit();
                         }
                     }
+                    engine_data.audio.play_sound("assets/crystal.wav");
                 },
                 GameEvent::Explosion(x, y) => {
                     let (x, y) = (x as i64, y as i64);
@@ -275,6 +277,7 @@ impl Map {
                             }
                         }
                     }
+                    engine_data.audio.play_sound("assets/explosion.wav");
                 },
                 GameEvent::Push(dir, item) => {
                     item.borrow_mut().push(dir, tick);
