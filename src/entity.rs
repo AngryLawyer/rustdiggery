@@ -12,6 +12,14 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use transform::TransformContext;
 
+fn partial_min(a: f64, b: f64) -> f64 {
+    if (a < b) {
+        a
+    } else {
+        b
+    }
+}
+
 pub trait EntityType {
     fn input(&mut self, state: &mut EntityState, key: Movement, adjacents: &Adjacents) {
     }
@@ -76,7 +84,7 @@ pub struct EntityState {
     pub x: u32,
     pub y: u32,
     pub destroyed: bool,
-    pub pos_fraction: f32,
+    pub pos_fraction: f64,
     pub movement: Movement,
     pub cell_move_state: CellMoveState,
     pub animation_state: AnimationState,
@@ -138,7 +146,7 @@ impl Entity {
                     self.state.pos_fraction = -0.4;
                     self.state.cell_move_state = CellMoveState::ENTERING;
                 } else {
-                    self.state.pos_fraction += 0.1;
+                    self.state.pos_fraction = partial_min(self.state.pos_fraction + 0.1, 0.5);
                 }
             },
             CellMoveState::ENTERING => {
@@ -147,7 +155,7 @@ impl Entity {
                     self.state.cell_move_state = CellMoveState::NEUTRAL;
                     self.state.movement = Movement::NEUTRAL;
                 } else {
-                    self.state.pos_fraction += 0.1;
+                    self.state.pos_fraction = partial_min(self.state.pos_fraction + 0.1, 0.0);
                 }
             }
         }
@@ -171,8 +179,8 @@ impl Entity {
             Movement::DOWN => (0.0, self.state.pos_fraction),
         };
         (
-            ((self.state.x * CELL_SIZE) as i32 + (CELL_SIZE as f32 * x_offset) as i32) as i32,
-            ((self.state.y * CELL_SIZE) as i32 + (CELL_SIZE as f32 * y_offset) as i32) as i32,
+            ((self.state.x * CELL_SIZE) as i32 + (CELL_SIZE as f64 * x_offset) as i32) as i32,
+            ((self.state.y * CELL_SIZE) as i32 + (CELL_SIZE as f64 * y_offset) as i32) as i32,
         )
     }
 
