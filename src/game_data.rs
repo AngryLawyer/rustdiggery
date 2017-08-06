@@ -7,11 +7,12 @@ use animation::{AnimationSet, Animation, AnimationFrame};
 use map::{CELL_SIZE};
 use map_loader::{load_maps, MapData};
 use tileset::Tileset;
+use std::rc::Rc;
 
 pub struct Animations {
-    pub crystal: AnimationSet,
-    pub exit: AnimationSet,
-    pub explosion: AnimationSet,
+    pub crystal: Rc<AnimationSet>,
+    pub exit: Rc<AnimationSet>,
+    pub explosion: Rc<AnimationSet>,
 }
 
 pub struct GameData<'a> {
@@ -80,9 +81,9 @@ impl<'a> GameData<'a> {
             assets,
             audio: GameData::load_audio(),
             animations: Animations {
-                crystal: crystal,
-                exit: exit,
-                explosion: GameData::explosion_animation(),
+                crystal: Rc::new(crystal),
+                exit: Rc::new(exit),
+                explosion: Rc::new(GameData::explosion_animation()),
             },
             maps: maps,
             tileset,

@@ -4,6 +4,8 @@ use game_scene::GameEvent;
 use map::{Adjacents, Adjacent};
 use cell_state::CellState;
 use sdl2_engine_helpers::event_bus::EventBus;
+use animation::AnimationSet;
+use std::rc::Rc;
 
 
 #[derive(Clone, Copy)]
@@ -145,5 +147,9 @@ impl EntityType for Enemy {
             },
             _ => ()
         }
+    }
+
+    fn get_animation(&self, engine_data: &GameData) -> Rc<AnimationSet> {
+        engine_data.animations.exit.clone()
     }
 }

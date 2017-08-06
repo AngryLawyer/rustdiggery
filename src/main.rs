@@ -92,7 +92,7 @@ fn main() {
                         InterstitalScene::new()
                     },
                     SceneChange::GameScene => {
-                        GameScene::new(renderer, game_data.maps.get(0).unwrap())
+                        GameScene::new(renderer, game_data, game_data.maps.get(0).unwrap())
                     },
                 }
             });

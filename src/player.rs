@@ -4,6 +4,8 @@ use game_scene::GameEvent;
 use cell_state::CellState;
 use map::{CELL_SIZE, Adjacents};
 use sdl2_engine_helpers::event_bus::EventBus;
+use animation::AnimationSet;
+use std::rc::Rc;
 
 pub struct Player {
     pushing: Movement,
@@ -132,5 +134,9 @@ impl EntityType for Player {
 
     fn is_player(&self) -> bool {
         true
+    }
+
+    fn get_animation(&self, engine_data: &GameData) -> Rc<AnimationSet> {
+        engine_data.animations.exit.clone()
     }
 }

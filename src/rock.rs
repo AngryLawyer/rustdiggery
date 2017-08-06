@@ -9,6 +9,8 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
+use animation::AnimationSet;
+use std::rc::Rc;
 
 const PUSH_AMPLITUDE: u32 = 10;
 
@@ -158,5 +160,9 @@ impl EntityType for Rock {
                 self.pushing = (direction, amplitude + 1, tick);
             }
         }
+    }
+
+    fn get_animation(&self, engine_data: &GameData) -> Rc<AnimationSet> {
+        engine_data.animations.exit.clone()
     }
 }

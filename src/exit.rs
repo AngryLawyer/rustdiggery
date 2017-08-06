@@ -11,6 +11,8 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
+use animation::AnimationSet;
+use std::rc::Rc;
 
 pub struct Exit {
     open: bool,
@@ -31,13 +33,13 @@ impl EntityType for Exit {
 
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, state: &EntityState, engine_data: &GameData, tick: u64) {
         let image = &engine_data.assets.tileset_raw;
-        let source = state.animation_state.get_frame(&engine_data.animations.exit).expect("Could not get animation frame");
+        let source = state.animation_state.get_frame().expect("Could not get animation frame");
         transform.copy(renderer, image, source.source_bounds, Rect::new(0, 0, CELL_SIZE, CELL_SIZE)).expect("Failed to draw entity");
     }
 
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         if tick % 5 == 0 {
-            state.animation_state.advance(&engine_data.animations.exit);
+            state.animation_state.advance();
         }
     }
 
@@ -62,5 +64,9 @@ impl EntityType for Exit {
             },
             _ => ()
         }
+    }
+
+    fn get_animation(&self, engine_data: &GameData) -> Rc<AnimationSet> {
+        engine_data.animations.exit.clone()
     }
 }

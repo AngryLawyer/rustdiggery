@@ -32,10 +32,10 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new<'a>(renderer: &mut Canvas<Window>, map_data: &MapData) -> BoxedRustdiggeryScene<'a> {
+    pub fn new<'a>(renderer: &mut Canvas<Window>, game_data: &GameData, map_data: &MapData) -> BoxedRustdiggeryScene<'a> {
         let mut scene = Box::new(GameScene {
             quitting: false,
-            map: Map::new(map_data),
+            map: Map::new(game_data, map_data),
             keyhandler: KeyHandler::new(),
             camera_pos: (0, 0),
             hud: Hud::new(),

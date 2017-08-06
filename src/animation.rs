@@ -1,5 +1,6 @@
 use sdl2::rect::Rect;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 pub struct AnimationSet {
     animations: HashMap<String, Animation>,
@@ -69,26 +70,27 @@ impl AnimationFrame {
 
 #[derive(Clone)]
 pub struct AnimationState {
-    // TODO: Find a nice way to make this deal in references
+    animation: Rc<AnimationSet>,
     current_animation: String,
     current_frame: usize,
 }
 
 impl AnimationState {
-    pub fn new() -> AnimationState {
+    pub fn new(animation: Rc<AnimationSet>) -> AnimationState {
         AnimationState {
+            animation: animation,
             current_animation: "idle".to_owned(),
             current_frame: 0,
         }
     }
 
-    pub fn get_frame<'a>(&self, animation: &'a AnimationSet) -> Option<&'a AnimationFrame> {
-        animation.get_frame(&self.current_animation, self.current_frame)
+    pub fn get_frame(&self) -> Option<&AnimationFrame> {
+        self.animation.get_frame(&self.current_animation, self.current_frame)
     }
 
-    pub fn advance(&mut self, animation: &AnimationSet) {
+    pub fn advance(&mut self) {
         // TODO: Currently we assume all animations just loop.
-        match animation.get_animation(&self.current_animation) {
+        match self.animation.get_animation(&self.current_animation) {
             Some(frames) => {
                 if self.current_frame == frames.len() - 1 {
                     self.current_frame = 0;
@@ -104,8 +106,8 @@ impl AnimationState {
         self.current_animation = animation.to_owned();
     }
 
-    pub fn is_last_frame(&self, animation: &AnimationSet) -> bool {
-        match animation.get_animation(&self.current_animation) {
+    pub fn is_last_frame(&self) -> bool {
+        match self.animation.get_animation(&self.current_animation) {
             Some(frames) => {
                 self.current_frame == frames.len() - 1
             },

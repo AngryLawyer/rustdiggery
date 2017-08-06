@@ -13,7 +13,7 @@ use std::rc::Rc;
 use transform::TransformContext;
 
 fn partial_min(a: f64, b: f64) -> f64 {
-    if (a < b) {
+    if a < b {
         a
     } else {
         b
@@ -61,6 +61,7 @@ pub trait EntityType {
             )
         ).expect("Failed to draw entity");
     }
+    fn get_animation(&self, state: &GameData) -> Rc<AnimationSet>;
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -104,7 +105,7 @@ pub struct Entity {
 
 impl Entity {
 
-    pub fn new(x: u32, y: u32, entity_type: Box<EntityType>, id: &mut u32) -> RcEntity {
+    pub fn new(game_data: &GameData, x: u32, y: u32, entity_type: Box<EntityType>, id: &mut u32) -> RcEntity {
         let item = Rc::new(RefCell::new(Entity {
             state: EntityState {
                 x: x,
@@ -113,7 +114,7 @@ impl Entity {
                 movement: Movement::NEUTRAL,
                 cell_move_state: CellMoveState::NEUTRAL,
                 destroyed: false,
-                animation_state: AnimationState::new(),
+                animation_state: AnimationState::new(entity_type.get_animation(game_data)),
                 id: *id
             },
             entity_type: entity_type

@@ -9,6 +9,8 @@ use sdl2::video::Window;
 use sdl2_engine_helpers::event_bus::EventBus;
 use transform::TransformContext;
 use game_data::GameData;
+use animation::AnimationSet;
+use std::rc::Rc;
 
 pub struct Crystal {
     momentum: bool,
@@ -30,7 +32,7 @@ impl EntityType for Crystal {
     fn think(&mut self, state: &mut EntityState, event_bus: &mut EventBus<GameEvent>, adjacents: &Adjacents, engine_data: &GameData, tick: u64) {
         think(state, event_bus, adjacents, tick, &mut self.momentum);
         if tick % 60 == 0 {
-            state.animation_state.advance(&engine_data.animations.crystal);
+            state.animation_state.advance();
         }
     }
 
@@ -48,11 +50,15 @@ impl EntityType for Crystal {
 
     fn render(&self, renderer: &mut Canvas<Window>, transform: &TransformContext, state: &EntityState, engine_data: &GameData, tick: u64) {
         let image = &engine_data.assets.crystal;
-        let source = state.animation_state.get_frame(&engine_data.animations.crystal).expect("Could not get animation frame");
+        let source = state.animation_state.get_frame().expect("Could not get animation frame");
         transform.copy(renderer, image, source.source_bounds, Rect::new(0, 0, CELL_SIZE, CELL_SIZE)).expect("Failed to draw entity");
     }
 
     fn score(&self) -> u32 {
         1
+    }
+
+    fn get_animation(&self, engine_data: &GameData) -> Rc<AnimationSet> {
+        engine_data.animations.crystal.clone()
     }
 }

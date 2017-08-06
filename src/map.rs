@@ -88,7 +88,7 @@ impl Adjacents {
 pub const CELL_SIZE: u32 = 32;
 
 impl Map {
-    pub fn new(data: &MapData) -> Map {
+    pub fn new(game_data: &GameData, data: &MapData) -> Map {
         let mut ids = 0;
         let mut entities = vec![];
         let mut cells = vec![CellState::Empty; (data.width * data.height) as usize];
@@ -113,32 +113,32 @@ impl Map {
                     CellState::Stone
                 },
                 '>' => {
-                    let entity = Entity::new(x, y, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
+                    let entity = Entity::new(game_data, x, y, Enemy::new(TurnDir::CLOCKWISE), &mut ids);
                     entities.push(entity);
                     CellState::Empty
                 },
                 '<' => {
-                    let entity = Entity::new(x, y, Enemy::new(TurnDir::ANTICLOCKWISE), &mut ids);
+                    let entity = Entity::new(game_data, x, y, Enemy::new(TurnDir::ANTICLOCKWISE), &mut ids);
                     entities.push(entity);
                     CellState::Empty
                 },
                 'o' => {
-                    let entity = Entity::new(x, y, Rock::new(), &mut ids);
+                    let entity = Entity::new(game_data, x, y, Rock::new(), &mut ids);
                     entities.push(entity);
                     CellState::Empty
                 },
                 '*' => {
-                    let entity = Entity::new(x, y, Crystal::new(), &mut ids);
+                    let entity = Entity::new(game_data, x, y, Crystal::new(), &mut ids);
                     entities.push(entity);
                     CellState::Empty
                 },
                 '&' => {
-                    let entity = Entity::new(x, y, Exit::new(), &mut ids);
+                    let entity = Entity::new(game_data, x, y, Exit::new(), &mut ids);
                     entities.push(entity);
                     CellState::Empty
                 },
                 '@' => {
-                    player = Some(Entity::new(x, y, Player::new(), &mut ids));
+                    player = Some(Entity::new(game_data, x, y, Player::new(), &mut ids));
                     CellState::Empty
                 },
                 _ => {
@@ -268,7 +268,7 @@ impl Map {
                             CellState::Wall => (),
                             _ => {
                                 self.set_cell_state(x, y, CellState::Empty);
-                                self.effects.push(Effect::new(x, y))
+                                self.effects.push(Effect::new(engine_data.animations.explosion.clone(), x, y))
                             }
                         };
                         for item in items {
